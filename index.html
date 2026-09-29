@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vocab Sheet Tool</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+</head><body>
+<header id="bar">
+ <div class="grp"><b>1 · Dữ liệu</b><button id="bPaste">📋 Dán &amp; quét</button><button id="bAddCol">＋ Cột</button></div>
+ <div class="grp"><b>2 · Chọn cột → vai trò</b>
+  <button data-role="q">Đề</button><button data-role="a">Đáp án</button><button data-role="inp">Ô nhập</button><button data-role="res">Kết quả</button><button id="bSwap">⇄ Đảo chiều</button></div>
+ <div class="grp"><b>3 · Chế độ</b>
+  <select id="mode"><option value="practice">Luyện tập: đúng/sai ngay</option><option value="exam">Kiểm tra: nộp bài mới chấm</option></select>
+  <label><input type="checkbox" id="ci" checked>Không phân biệt hoa/thường</label>
+  <label><input type="checkbox" id="multi">Nhiều đáp án (a | b)</label>
+  <label><input type="checkbox" id="hide">Ẩn cột đáp án</label></div>
+ <div class="grp"><b>4 · Hàng</b>từ <input id="r1" type="number"> đến <input id="r2" type="number"><button id="bApply" class="pri">✔ Áp công thức</button></div>
+ <div class="grp"><b>5 · Đề</b><button id="bShuf">🔀 Trộn hàng</button><button id="bRest">↩ Thứ tự gốc</button><input id="nPick" type="number" placeholder="n câu"><button id="bPick">🎲 Lấy n câu</button></div>
+ <div class="grp"><b>6 · Xuất</b><button id="bLock" class="on">🔒 Khoá bảng: BẬT</button><input id="pw" placeholder="mật khẩu (tuỳ chọn)">số đề <input id="nv" type="number" value="1" min="1" max="10"><button id="bExp" class="pri">📥 Xuất XLSX</button></div>
+</header>
+<div id="fx"><span id="nm">A1</span><span class="f">fx</span><span id="fv"></span></div>
+<div id="wrap"><table id="grid"></table></div>
+<div id="dlg" hidden><div>
+ <p><b>Dán toàn bộ từ vựng</b> (tab, |, ; hoặc ≥2 dấu cách; dạng "你好 nǐ hǎo xin chào" cũng được)</p>
+ <textarea id="ta" placeholder="你好&#9;nǐ hǎo&#9;xin chào"></textarea>
+ <p><button id="go" class="pri">Quét &amp; đưa vào bảng</button> <button id="close">Đóng</button></p>
+</div></div>
+<script src="app.js"></script>
+</body></html>
