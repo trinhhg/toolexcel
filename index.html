@@ -1,28 +1,179 @@
-<!doctype html>
-<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Vocab Sheet Tool</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
-</head><body>
-<header id="bar">
- <div class="grp"><b>1 · Dữ liệu</b><button id="bPaste">📋 Dán &amp; quét</button><button id="bAddCol">＋ Cột</button></div>
- <div class="grp"><b>2 · Chọn cột → vai trò</b>
-  <button data-role="q">Đề</button><button data-role="a">Đáp án</button><button data-role="inp">Ô nhập</button><button data-role="res">Kết quả</button><button id="bSwap">⇄ Đảo chiều</button></div>
- <div class="grp"><b>3 · Chế độ</b>
-  <select id="mode"><option value="practice">Luyện tập: đúng/sai ngay</option><option value="exam">Kiểm tra: nộp bài mới chấm</option></select>
-  <label><input type="checkbox" id="ci" checked>Không phân biệt hoa/thường</label>
-  <label><input type="checkbox" id="multi">Nhiều đáp án (a | b)</label>
-  <label><input type="checkbox" id="hide">Ẩn cột đáp án</label></div>
- <div class="grp"><b>4 · Hàng</b>từ <input id="r1" type="number"> đến <input id="r2" type="number"><button id="bApply" class="pri">✔ Áp công thức</button></div>
- <div class="grp"><b>5 · Đề</b><button id="bShuf">🔀 Trộn hàng</button><button id="bRest">↩ Thứ tự gốc</button><input id="nPick" type="number" placeholder="n câu"><button id="bPick">🎲 Lấy n câu</button></div>
- <div class="grp"><b>6 · Xuất</b><button id="bLock" class="on">🔒 Khoá bảng: BẬT</button><input id="pw" placeholder="mật khẩu (tuỳ chọn)">số đề <input id="nv" type="number" value="1" min="1" max="10"><button id="bExp" class="pri">📥 Xuất XLSX</button></div>
-</header>
-<div id="fx"><span id="nm">A1</span><span class="f">fx</span><span id="fv"></span></div>
-<div id="wrap"><table id="grid"></table></div>
-<div id="dlg" hidden><div>
- <p><b>Dán toàn bộ từ vựng</b> (tab, |, ; hoặc ≥2 dấu cách; dạng "你好 nǐ hǎo xin chào" cũng được)</p>
- <textarea id="ta" placeholder="你好&#9;nǐ hǎo&#9;xin chào"></textarea>
- <p><button id="go" class="pri">Quét &amp; đưa vào bảng</button> <button id="close">Đóng</button></p>
-</div></div>
-<script src="app.js"></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vocab Sheet Studio - Công cụ tạo đề từ vựng Excel</title>
+  <link rel="stylesheet" href="index.css">
+  <!-- Thư viện ExcelJS tạo file XLSX chuyên nghiệp -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+</head>
+<body>
+
+  <!-- THANH CÔNG CỤ CHÍNH (RIBBON TOOLBAR) -->
+  <header id="toolbar">
+    <!-- Nhóm 1: Dữ liệu & Bảng tính -->
+    <div class="tool-group">
+      <div class="group-title">1. DỮ LIỆU & BẢNG</div>
+      <div class="group-content">
+        <button id="btnImportModal" class="btn btn-primary">📋 Dán & Quét dữ liệu</button>
+        <div class="btn-cluster">
+          <button id="btnAddRow" title="Thêm dòng mới vào cuối bảng">➕ Hàng</button>
+          <button id="btnDelRow" title="Xóa các hàng đang chọn" class="btn-danger">🗑️ Xóa hàng</button>
+        </div>
+        <div class="btn-cluster">
+          <button id="btnAddCol" title="Thêm cột mới">➕ Cột</button>
+          <button id="btnDelCol" title="Xóa cột đang chọn" class="btn-danger">🗑️ Cột</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhóm 2: Vai trò cột -->
+    <div class="tool-group">
+      <div class="group-title">2. GÁN VAI TRÒ CỘT</div>
+      <div class="group-content">
+        <button id="btnSetRoleQ" class="btn-role">🎯 Đề bài</button>
+        <button id="btnSetRoleA" class="btn-role">🔑 Đáp án chuẩn</button>
+        <button id="btnSetRoleInput" class="btn-role">✏️ Ô nhập</button>
+        <button id="btnSetRoleRes" class="btn-role">📊 Kết quả</button>
+        <button id="btnSwapQA" title="Đảo ngược vai trò giữa Đề và Đáp án">⇄ Đảo Đề ↔ Đáp án</button>
+      </div>
+    </div>
+
+    <!-- Nhóm 3: Chế độ & Quy tắc chấm -->
+    <div class="tool-group">
+      <div class="group-title">3. CHẾ ĐỘ & QUY TẮC</div>
+      <div class="group-content">
+        <select id="examMode">
+          <option value="practice">🟢 Luyện tập: Hiện đúng/sai ngay</option>
+          <option value="exam">📝 Kiểm tra: Nộp bài mới chấm</option>
+        </select>
+        <div class="checkbox-group">
+          <label title="Không phân biệt chữ hoa, chữ thường (A == a)"><input type="checkbox" id="chkCaseInsensitive" checked> Không phân biệt hoa/thường</label>
+          <label title="Hỗ trợ nhiều đáp án phân tách bằng dấu gạch đứng |"><input type="checkbox" id="chkMultipleAnswers" checked> Nhiều đáp án (a | b)</label>
+          <label title="Cột đáp án sẽ bị ẩn đi trong file Excel để người làm không thấy"><input type="checkbox" id="chkHideAnswer"> Ẩn cột đáp án khi xuất</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhóm 4: Trộn đề ngẫu nhiên -->
+    <div class="tool-group">
+      <div class="group-title">4. TRỘN & TẠO ĐỀ</div>
+      <div class="group-content">
+        <button id="btnShuffle" class="btn btn-warning" title="Trộn ngẫu nhiên toàn bộ các hàng (Đề và Đáp án luôn đi cùng nhau)">🔀 Trộn nguyên hàng</button>
+        <button id="btnRestore" title="Khôi phục lại thứ tự ban đầu lúc mới nạp">↩ Khôi phục gốc</button>
+        <div class="inline-input">
+          <input type="number" id="numPick" placeholder="Số câu" min="1" style="width: 60px;">
+          <button id="btnPickSubset" title="Chọn ngẫu nhiên N câu không trùng lặp">🎲 Lấy N câu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nhóm 5: Xuất file Excel -->
+    <div class="tool-group">
+      <div class="group-title">5. XUẤT EXCEL (.XLSX)</div>
+      <div class="group-content">
+        <button id="btnToggleLock" class="btn btn-toggle on">🔒 Khóa Sheet: BẬT</button>
+        <input type="password" id="sheetPassword" placeholder="Mật khẩu khóa (tuỳ chọn)" style="width: 110px;">
+        <div class="inline-input">
+          <span>Số đề:</span>
+          <input type="number" id="numVariants" value="1" min="1" max="10" style="width: 48px;">
+        </div>
+        <button id="btnExportExcel" class="btn btn-success">📥 Xuất XLSX</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- BẢNG ĐIỀU KHIỂN ĐIỂM SỐ & TIẾN ĐỘ TRỰC QUAN (LIVE DASHBOARD) -->
+  <section id="dashboard">
+    <div class="dash-card card-correct">
+      <span class="card-label">✅ ĐÚNG</span>
+      <span class="card-value" id="statCorrect">0</span>
+    </div>
+    <div class="dash-card card-wrong">
+      <span class="card-label">❌ SAI</span>
+      <span class="card-value" id="statWrong">0</span>
+    </div>
+    <div class="dash-card card-pending">
+      <span class="card-label">⚪ CHƯA LÀM</span>
+      <span class="card-value" id="statPending">0</span>
+    </div>
+    <div class="dash-card card-total">
+      <span class="card-label">📝 TỔNG CÂU</span>
+      <span class="card-value" id="statTotal">0</span>
+    </div>
+    <div class="dash-card card-score">
+      <span class="card-label">📊 ĐIỂM /10</span>
+      <span class="card-value" id="statScore">0.00</span>
+    </div>
+    <div class="dash-card card-rate">
+      <span class="card-label">📈 TỶ LỆ</span>
+      <span class="card-value" id="statRate">0%</span>
+    </div>
+
+    <!-- Thanh tiến độ hoàn thành -->
+    <div class="progress-wrap">
+      <div class="progress-label-row">
+        <span>Tiến độ hoàn thành: <strong id="progressText">0/0 câu (0%)</strong></span>
+        <span id="examStatusBadge" class="badge">Đang luyện tập</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- Nút Nộp bài ở chế độ Kiểm tra -->
+    <div id="examActionArea" style="display: none;">
+      <button id="btnSubmitExam" class="btn btn-warning">📝 NỘP BÀI KIỂM TRA</button>
+      <button id="btnResetExam" class="btn" style="display: none;">🔄 Làm lại bài</button>
+    </div>
+  </section>
+
+  <!-- THANH CÔNG THỨC (FX BAR) -->
+  <div id="fx-bar">
+    <div id="active-cell-coord">A1</div>
+    <div class="fx-icon">fx</div>
+    <input type="text" id="fx-input" placeholder="Giá trị hoặc công thức ô được chọn..." autocomplete="off">
+  </div>
+
+  <!-- VÙNG BẢNG TÍNH SPREADSHEET -->
+  <main id="sheet-container">
+    <table id="sheet-table">
+      <!-- Headers và Body sẽ do JavaScript render -->
+    </table>
+  </main>
+
+  <!-- MODAL: DÁN & QUÉT TỪ VỰNG THÔNG MINH -->
+  <div id="importModal" class="modal-backdrop" hidden>
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📋 Nạp & Nhận diện từ vựng thông minh</h3>
+        <button class="modal-close" id="btnModalClose">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-hint">
+          Dán dữ liệu từ vựng vào đây (copy từ Excel, Google Sheets, Quizlet, hoặc dạng <code>你好 nǐ hǎo xin chào</code>).
+          Tool sẽ tự động nhận diện cột Chữ Hán, Pinyin và Tiếng Việt.
+        </p>
+        <textarea id="importTextarea" placeholder="你好	nǐ hǎo	xin chào&#10;谢谢	xièxie	cảm ơn&#10;学校	xuéxiào	trường học"></textarea>
+
+        <!-- Preview & Gán cột trước khi đưa vào bảng -->
+        <div id="previewArea" style="display: none; margin-top: 12px;">
+          <h4>Xem trước dữ liệu nhận diện & Gán vai trò cột:</h4>
+          <div class="preview-table-wrap">
+            <table id="previewTable"></table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btnAnalyze" class="btn btn-primary">🔍 Phân tích dữ liệu</button>
+        <button id="btnConfirmImport" class="btn btn-success" style="display: none;">✔ Xác nhận nạp vào bảng</button>
+        <button id="btnCancelImport" class="btn">Hủy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nạp logic JavaScript -->
+  <script src="index.js"></script>
+</body>
+</html>
