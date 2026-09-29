@@ -1,0 +1,543 @@
+/* ========================================================
+   VOCAB SHEET STUDIO - STYLESHEET
+   Style hiện đại, clean chuẩn ứng dụng Excel/Dashboard
+   ======================================================== */
+
+:root {
+  --primary: #107c41;       /* Excel Green */
+  --primary-hover: #0b5a30;
+  --primary-light: #e8f5e9;
+  --bg-main: #f3f4f6;
+  --bg-toolbar: #1e293b;
+  --text-toolbar: #f8fafc;
+  --border-color: #cbd5e1;
+  --cell-selected: #e2f0cb;
+  --cell-highlight: rgba(16, 124, 65, 0.12);
+  --success-bg: #dcfce7;
+  --success-text: #166534;
+  --danger-bg: #fee2e2;
+  --danger-text: #991b1b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-size: 13px;
+  background-color: var(--bg-main);
+  color: #1e293b;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 1. RIBBON TOOLBAR */
+#toolbar {
+  background-color: var(--bg-toolbar);
+  color: var(--text-toolbar);
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.tool-group {
+  background: #334155;
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.group-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.group-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Nút bấm */
+button, .btn {
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  background: #f8fafc;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+button:hover {
+  background: #e2e8f0;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-success {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+.btn-success:hover {
+  background: var(--primary-hover);
+}
+
+.btn-warning {
+  background: #f59e0b;
+  color: #1e293b;
+  font-weight: 600;
+}
+.btn-warning:hover {
+  background: #d97706;
+}
+
+.btn-danger {
+  color: #ef4444;
+}
+.btn-danger:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-role {
+  background: #475569;
+  color: #f8fafc;
+  border: 1px solid #64748b;
+}
+.btn-role:hover {
+  background: #64748b;
+}
+
+.btn-toggle.on {
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 600;
+  border-color: #86efac;
+}
+
+.btn-cluster {
+  display: inline-flex;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #64748b;
+}
+.btn-cluster button {
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid #cbd5e1;
+}
+.btn-cluster button:last-child {
+  border-right: 0;
+}
+
+input, select {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  outline: none;
+  background: #fff;
+}
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 11.5px;
+  color: #e2e8f0;
+}
+.checkbox-group label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inline-input {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #e2e8f0;
+}
+
+/* 2. DASHBOARD BẢNG ĐIỂM */
+#dashboard {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dash-card {
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 65px;
+  border: 1px solid #e2e8f0;
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.card-value {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.card-correct { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+.card-wrong { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.card-pending { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+.card-total { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.card-score { background: #fefce8; border-color: #fef08a; color: #854d0e; }
+.card-rate { background: #faf5ff; border-color: #e9d5ff; color: #6b21a8; }
+
+.progress-wrap {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progress-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+}
+
+.badge {
+  background: #e2e8f0;
+  color: #475569;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  height: 9px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #107c41, #22c55e);
+  transition: width 0.3s ease;
+}
+
+/* 3. THANH FX */
+#fx-bar {
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 8px;
+}
+
+#active-cell-coord {
+  width: 55px;
+  font-weight: 700;
+  font-size: 12px;
+  color: #334155;
+  text-align: center;
+  border-right: 1px solid var(--border-color);
+}
+
+.fx-icon {
+  padding: 0 8px;
+  font-style: italic;
+  font-weight: bold;
+  color: var(--primary);
+  user-select: none;
+}
+
+#fx-input {
+  flex: 1;
+  border: 0;
+  height: 100%;
+  padding: 0 6px;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+/* 4. SPREADSHEET TABLE */
+#sheet-container {
+  flex: 1;
+  overflow: auto;
+  background: #ffffff;
+  position: relative;
+}
+
+#sheet-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+/* Header ô A, B, C... và hàng 1, 2, 3... */
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 11.5px;
+  border: 1px solid #cbd5e1;
+  text-align: center;
+  user-select: none;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+th.corner-header {
+  left: 0;
+  z-index: 5;
+  width: 45px;
+  min-width: 45px;
+  cursor: pointer;
+  background: #f1f5f9;
+}
+
+th.col-header {
+  padding: 4px 6px;
+  min-width: 120px;
+  cursor: pointer;
+}
+th.col-header:hover {
+  background: #e2e8f0;
+}
+th.col-header.selected {
+  background: #cbd5e1;
+  color: var(--primary);
+}
+
+/* Nhãn vai trò nhỏ dưới chữ cái cột A, B, C */
+.col-role-tag {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+th.row-header {
+  left: 0;
+  top: auto;
+  z-index: 2;
+  width: 45px;
+  min-width: 45px;
+  background: #f8fafc;
+  cursor: pointer;
+}
+th.row-header:hover {
+  background: #e2e8f0;
+}
+th.row-header.selected {
+  background: #cbd5e1;
+  color: var(--primary);
+}
+
+/* Các ô dữ liệu TD */
+td {
+  border: 1px solid #e2e8f0;
+  height: 26px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  outline: none;
+  font-size: 13px;
+  user-select: none;
+}
+
+td[contenteditable="true"] {
+  cursor: cell;
+}
+
+td.cell-selected {
+  background-color: var(--cell-highlight);
+}
+
+td.cell-focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  background-color: #fff !important;
+}
+
+/* Trạng thái chấm điểm */
+td[data-status="ok"] {
+  background-color: var(--success-bg) !important;
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+td[data-status="bad"] {
+  background-color: var(--danger-bg) !important;
+  color: var(--danger-text);
+  font-weight: 600;
+}
+
+/* Ô nhập liệu đáp án nổi bật */
+td.col-input-cell {
+  background-color: #fcfbf2;
+}
+
+/* Ô kết quả công thức */
+td.col-res-cell {
+  text-align: center;
+  font-weight: 700;
+}
+
+/* 5. MODAL QUÉT DỮ LIỆU */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-backdrop[hidden] {
+  display: none;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 8px;
+  width: min(850px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 {
+  font-size: 15px;
+  color: #0f172a;
+}
+.modal-close {
+  background: none;
+  border: 0;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-hint {
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+#importTextarea {
+  width: 100%;
+  height: 160px;
+  font-family: 'Consolas', monospace;
+  font-size: 13px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  outline: none;
+  resize: vertical;
+}
+
+.preview-table-wrap {
+  max-height: 250px;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
+#previewTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+#previewTable th, #previewTable td {
+  border: 1px solid #e2e8f0;
+  padding: 6px 8px;
+  text-align: left;
+}
+#previewTable th {
+  background: #f8fafc;
+}
+#previewTable select {
+  width: 100%;
+  padding: 3px;
+}
+
+.modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
