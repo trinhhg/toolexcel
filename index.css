@@ -1,22 +1,23 @@
 /* ========================================================
    VOCAB SHEET STUDIO - STYLESHEET
-   Style hiện đại, clean chuẩn ứng dụng Excel/Dashboard
+   Giao diện chuẩn Excel / Ribbon Dashboard hiện đại & Clean
    ======================================================== */
 
 :root {
-  --primary: #107c41;       /* Excel Green */
+  --primary: #107c41;         /* Màu xanh chuẩn Excel */
   --primary-hover: #0b5a30;
   --primary-light: #e8f5e9;
-  --bg-main: #f3f4f6;
-  --bg-toolbar: #1e293b;
+  --bg-main: #f1f5f9;
+  --bg-toolbar: #1e293b;      /* Slate Dark cho Ribbon */
   --text-toolbar: #f8fafc;
   --border-color: #cbd5e1;
   --cell-selected: #e2f0cb;
-  --cell-highlight: rgba(16, 124, 65, 0.12);
+  --cell-highlight: rgba(16, 124, 65, 0.14);
   --success-bg: #dcfce7;
   --success-text: #166534;
   --danger-bg: #fee2e2;
   --danger-text: #991b1b;
+  --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
 }
 
 * {
@@ -26,7 +27,7 @@
 }
 
 body {
-  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  font-family: var(--font-family);
   font-size: 13px;
   background-color: var(--bg-main);
   color: #1e293b;
@@ -36,16 +37,19 @@ body {
   overflow: hidden;
 }
 
-/* 1. RIBBON TOOLBAR */
+/* ========================================================
+   1. RIBBON TOOLBAR
+   ======================================================== */
 #toolbar {
   background-color: var(--bg-toolbar);
   color: var(--text-toolbar);
   padding: 8px 12px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  z-index: 10;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 20;
 }
 
 .tool-group {
@@ -55,31 +59,33 @@ body {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex-shrink: 0;
 }
 
 .group-title {
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 700;
   color: #94a3b8;
   letter-spacing: 0.5px;
   text-transform: uppercase;
+  user-select: none;
 }
 
 .group-content {
   display: flex;
   align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 5px;
+  flex-wrap: nowrap;
 }
 
-/* Nút bấm */
+/* Các loại nút bấm */
 button, .btn {
   font-family: inherit;
   font-size: 12px;
   font-weight: 500;
   border: 1px solid transparent;
   border-radius: 4px;
-  padding: 5px 10px;
+  padding: 5px 9px;
   cursor: pointer;
   background: #f8fafc;
   color: #0f172a;
@@ -88,49 +94,41 @@ button, .btn {
   gap: 4px;
   transition: all 0.15s ease;
   user-select: none;
+  white-space: nowrap;
 }
 
-button:hover {
-  background: #e2e8f0;
-}
-
-button:active {
-  transform: translateY(1px);
-}
+button:hover { background: #e2e8f0; }
+button:active { transform: translateY(1px); }
 
 .btn-primary {
   background: #2563eb;
   color: #fff;
   font-weight: 600;
 }
-.btn-primary:hover {
-  background: #1d4ed8;
-}
+.btn-primary:hover { background: #1d4ed8; }
 
 .btn-success {
   background: var(--primary);
   color: #fff;
   font-weight: 600;
 }
-.btn-success:hover {
-  background: var(--primary-hover);
-}
+.btn-success:hover { background: var(--primary-hover); }
 
 .btn-warning {
   background: #f59e0b;
   color: #1e293b;
   font-weight: 600;
 }
-.btn-warning:hover {
-  background: #d97706;
-}
+.btn-warning:hover { background: #d97706; }
 
 .btn-danger {
-  color: #ef4444;
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
 }
 .btn-danger:hover {
-  background: #fee2e2;
-  color: #b91c1c;
+  background: #ef4444;
+  color: #ffffff;
 }
 
 .btn-role {
@@ -138,9 +136,7 @@ button:active {
   color: #f8fafc;
   border: 1px solid #64748b;
 }
-.btn-role:hover {
-  background: #64748b;
-}
+.btn-role:hover { background: #64748b; }
 
 .btn-toggle.on {
   background: #dcfce7;
@@ -160,14 +156,12 @@ button:active {
   border: 0;
   border-right: 1px solid #cbd5e1;
 }
-.btn-cluster button:last-child {
-  border-right: 0;
-}
+.btn-cluster button:last-child { border-right: 0; }
 
 input, select {
   font-family: inherit;
   font-size: 12px;
-  padding: 4px 8px;
+  padding: 4px 7px;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
   outline: none;
@@ -181,8 +175,8 @@ input:focus, select:focus {
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  font-size: 11.5px;
+  gap: 2px;
+  font-size: 11px;
   color: #e2e8f0;
 }
 .checkbox-group label {
@@ -190,6 +184,7 @@ input:focus, select:focus {
   display: flex;
   align-items: center;
   gap: 4px;
+  user-select: none;
 }
 
 .inline-input {
@@ -200,36 +195,36 @@ input:focus, select:focus {
   color: #e2e8f0;
 }
 
-/* 2. DASHBOARD BẢNG ĐIỂM */
+/* ========================================================
+   2. DASHBOARD TIẾN ĐỘ & ĐIỂM SỐ
+   ======================================================== */
 #dashboard {
   background: #ffffff;
   border-bottom: 1px solid var(--border-color);
-  padding: 8px 16px;
+  padding: 6px 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .dash-card {
-  padding: 4px 10px;
-  border-radius: 6px;
+  padding: 4px 8px;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 65px;
+  min-width: 60px;
   border: 1px solid #e2e8f0;
 }
-
 .card-label {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #64748b;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
-
 .card-value {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -242,18 +237,16 @@ input:focus, select:focus {
 
 .progress-wrap {
   flex: 1;
-  min-width: 220px;
+  min-width: 180px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
-
 .progress-label-row {
   display: flex;
   justify-content: space-between;
   font-size: 11.5px;
 }
-
 .badge {
   background: #e2e8f0;
   color: #475569;
@@ -262,21 +255,27 @@ input:focus, select:focus {
   font-size: 10.5px;
   font-weight: 600;
 }
-
 .progress-bar-bg {
-  height: 9px;
+  height: 8px;
   background: #e2e8f0;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
 }
-
 .progress-bar-fill {
   height: 100%;
   background: linear-gradient(90deg, #107c41, #22c55e);
   transition: width 0.3s ease;
 }
 
-/* 3. THANH FX */
+.dashboard-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ========================================================
+   3. THANH FX FORMULA BAR
+   ======================================================== */
 #fx-bar {
   background: #ffffff;
   border-bottom: 1px solid var(--border-color);
@@ -284,19 +283,28 @@ input:focus, select:focus {
   align-items: center;
   height: 28px;
   padding: 0 8px;
+  gap: 6px;
 }
 
 #active-cell-coord {
-  width: 55px;
+  width: 50px;
   font-weight: 700;
   font-size: 12px;
   color: #334155;
   text-align: center;
-  border-right: 1px solid var(--border-color);
+}
+
+.cell-role-indicator {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #bbf7d0;
 }
 
 .fx-icon {
-  padding: 0 8px;
   font-style: italic;
   font-weight: bold;
   color: var(--primary);
@@ -313,7 +321,9 @@ input:focus, select:focus {
   outline: none;
 }
 
-/* 4. SPREADSHEET TABLE */
+/* ========================================================
+   4. BẢNG TÍNH SPREADSHEET TABLE
+   ======================================================== */
 #sheet-container {
   flex: 1;
   overflow: auto;
@@ -325,9 +335,10 @@ input:focus, select:focus {
   border-collapse: collapse;
   table-layout: fixed;
   background: #fff;
+  user-select: none;
 }
 
-/* Header ô A, B, C... và hàng 1, 2, 3... */
+/* Tiêu đề cột & hàng */
 th {
   background: #f8fafc;
   color: #475569;
@@ -335,15 +346,14 @@ th {
   font-size: 11.5px;
   border: 1px solid #cbd5e1;
   text-align: center;
-  user-select: none;
   position: sticky;
   top: 0;
-  z-index: 3;
+  z-index: 4;
 }
 
 th.corner-header {
   left: 0;
-  z-index: 5;
+  z-index: 6;
   width: 45px;
   min-width: 45px;
   cursor: pointer;
@@ -352,24 +362,22 @@ th.corner-header {
 
 th.col-header {
   padding: 4px 6px;
-  min-width: 120px;
+  min-width: 110px;
   cursor: pointer;
 }
-th.col-header:hover {
-  background: #e2e8f0;
-}
-th.col-header.selected {
+th.col-header:hover { background: #e2e8f0; }
+th.col-header.col-selected {
   background: #cbd5e1;
   color: var(--primary);
+  border-bottom: 2px solid var(--primary);
 }
 
-/* Nhãn vai trò nhỏ dưới chữ cái cột A, B, C */
 .col-role-tag {
   display: block;
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 700;
   color: var(--primary);
-  margin-top: 2px;
+  margin-top: 1px;
   white-space: nowrap;
 }
 
@@ -382,15 +390,14 @@ th.row-header {
   background: #f8fafc;
   cursor: pointer;
 }
-th.row-header:hover {
-  background: #e2e8f0;
-}
-th.row-header.selected {
+th.row-header:hover { background: #e2e8f0; }
+th.row-header.row-selected {
   background: #cbd5e1;
   color: var(--primary);
+  border-right: 2px solid var(--primary);
 }
 
-/* Các ô dữ liệu TD */
+/* Ô dữ liệu TD */
 td {
   border: 1px solid #e2e8f0;
   height: 26px;
@@ -400,13 +407,12 @@ td {
   text-overflow: ellipsis;
   outline: none;
   font-size: 13px;
-  user-select: none;
+  position: relative;
 }
 
-td[contenteditable="true"] {
-  cursor: cell;
-}
+td[contenteditable="true"] { cursor: cell; }
 
+/* Bôi đen ô & ô đang focus */
 td.cell-selected {
   background-color: var(--cell-highlight);
 }
@@ -417,53 +423,71 @@ td.cell-focus {
   background-color: #fff !important;
 }
 
-/* Trạng thái chấm điểm */
-td[data-status="ok"] {
-  background-color: var(--success-bg) !important;
-  color: var(--success-text);
-  font-weight: 600;
-}
-
-td[data-status="bad"] {
-  background-color: var(--danger-bg) !important;
-  color: var(--danger-text);
-  font-weight: 600;
-}
-
-/* Ô nhập liệu đáp án nổi bật */
+/* Các kiểu ô đặc thù */
 td.col-input-cell {
   background-color: #fcfbf2;
 }
 
-/* Ô kết quả công thức */
 td.col-res-cell {
   text-align: center;
   font-weight: 700;
 }
 
-/* 5. MODAL QUÉT DỮ LIỆU */
+/* Ô che (Mask Cell) */
+td.col-mask-cell.masked {
+  color: #94a3b8;
+  font-style: italic;
+  background-color: #f8fafc;
+  letter-spacing: 1px;
+}
+td.col-mask-cell.revealed {
+  color: #1e293b;
+  font-weight: 600;
+  background-color: #f0fdf4;
+}
+
+/* Trạng thái chấm điểm Đúng / Sai */
+td[data-status="ok"] {
+  background-color: var(--success-bg) !important;
+  color: var(--success-text);
+  font-weight: 700;
+}
+
+td[data-status="bad"] {
+  background-color: var(--danger-bg) !important;
+  color: var(--danger-text);
+  font-weight: 700;
+}
+
+/* ========================================================
+   5. CỬA SỔ MODAL CHUNG
+   ======================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(2px);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 999;
 }
-.modal-backdrop[hidden] {
-  display: none;
-}
+.modal-backdrop[hidden] { display: none; }
 
 .modal-box {
   background: #fff;
   border-radius: 8px;
-  width: min(850px, 94vw);
+  width: min(900px, 95vw);
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+  box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-header {
@@ -473,16 +497,14 @@ td.col-res-cell {
   justify-content: space-between;
   align-items: center;
 }
-.modal-header h3 {
-  font-size: 15px;
-  color: #0f172a;
-}
+.modal-header h3 { font-size: 15px; color: #0f172a; }
 .modal-close {
   background: none;
   border: 0;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   color: #64748b;
+  padding: 0 4px;
 }
 
 .modal-body {
@@ -495,12 +517,13 @@ td.col-res-cell {
   font-size: 12px;
   color: #475569;
   margin-bottom: 8px;
+  line-height: 1.5;
 }
 
 #importTextarea {
   width: 100%;
-  height: 160px;
-  font-family: 'Consolas', monospace;
+  height: 140px;
+  font-family: 'Consolas', 'Courier New', monospace;
   font-size: 13px;
   padding: 8px;
   border: 1px solid var(--border-color);
@@ -509,30 +532,45 @@ td.col-res-cell {
   resize: vertical;
 }
 
+.delimiter-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px 0;
+  flex-wrap: wrap;
+}
+.btn-delimit {
+  font-size: 11.5px;
+  padding: 3px 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-delimit.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
 .preview-table-wrap {
-  max-height: 250px;
+  max-height: 230px;
   overflow: auto;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  margin-top: 8px;
 }
-
 #previewTable {
   width: 100%;
   border-collapse: collapse;
 }
 #previewTable th, #previewTable td {
   border: 1px solid #e2e8f0;
-  padding: 6px 8px;
+  padding: 5px 8px;
   text-align: left;
 }
-#previewTable th {
-  background: #f8fafc;
-}
-#previewTable select {
-  width: 100%;
-  padding: 3px;
-}
+#previewTable th { background: #f8fafc; }
+#previewTable select { width: 100%; padding: 3px; font-weight: 600; }
 
 .modal-footer {
   padding: 12px 16px;
@@ -540,4 +578,163 @@ td.col-res-cell {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* ========================================================
+   6. MODAL FLASHCARD 3D
+   ======================================================== */
+.flashcard-box { width: min(580px, 94vw); }
+.flashcard-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px;
+}
+.flashcard-status {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.flashcard-wrapper {
+  width: 100%;
+  height: 240px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+.flashcard-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+}
+.flashcard-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+}
+.flashcard-front {
+  background: linear-gradient(135deg, #ffffff, #f8fafc);
+}
+.flashcard-back {
+  background: linear-gradient(135deg, #f0fdf4, #e8f5e9);
+  transform: rotateY(180deg);
+  border-color: #86efac;
+}
+
+.fc-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 1px;
+  position: absolute;
+  top: 14px;
+}
+.fc-main-text {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+.fc-sub-text {
+  font-size: 12px;
+  color: #64748b;
+}
+.fc-phonetic {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+.fc-extra-info {
+  font-size: 13px;
+  color: #334155;
+  background: rgba(255,255,255,0.7);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.flashcard-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ========================================================
+   7. MODAL TRẮC NGHIỆM QUIZ
+   ======================================================== */
+.quiz-box { width: min(600px, 94vw); }
+.quiz-body { display: flex; flex-direction: column; gap: 14px; }
+.quiz-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+}
+.quiz-streak { color: #d97706; }
+.quiz-score { color: #166534; }
+
+.quiz-question-card {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+.quiz-q-label { font-size: 11.5px; color: #64748b; }
+.quiz-question-text {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 6px 0;
+}
+
+.quiz-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.quiz-opt-btn {
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+}
+.quiz-opt-btn:hover { background: #f1f5f9; border-color: #94a3b8; }
+.quiz-opt-btn.correct { background: #dcfce7 !important; color: #166534; border-color: #86efac; }
+.quiz-opt-btn.wrong { background: #fee2e2 !important; color: #991b1b; border-color: #fca5a5; }
+
+.quiz-feedback {
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
 }
