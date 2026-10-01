@@ -1,53 +1,48 @@
 /**
- * VOCAB SHEET STUDIO - INDEX.JS
- * Kiến trúc nâng cấp:
- * 1. Bộ quét Universal Multi-Engine Scanner nhận diện chính xác mọi ngôn ngữ & ký tự
- * 2. Hỗ trợ bôi đen nhiều hàng/nhiều cột rồi xóa (Multi-Select & Delete)
- * 3. Ẩn cột Mã từ (ID) khi xuất Excel & Import ngược file XLSX/CSV để chỉnh sửa tiếp
- * 4. Ký hiệu chuẩn hóa không lỗi font/đen trắng trong Excel
- * 5. Cơ chế Ô che (Mask Cell) mở khóa khi gõ đúng hoặc nộp bài
- * 6. Tích hợp chế độ Thẻ Flashcard 3D, Trắc nghiệm 4 câu & Phát âm Web Speech TTS
+ * VOCAB STUDIO PRO - COMPLETE JAVASCRIPT REBUILD
+ * Kiến trúc cột động (Dynamic Columns Engine), Bộ quét Universal Parser,
+ * Hỗ trợ TTS Tiếng Trung Giản Thể & Bảo vệ công thức khi xuất file Excel.
  */
 
 // ==========================================
 // 1. TRẠNG THÁI ỨNG DỤNG (APPLICATION STATE)
 // ==========================================
 const App = {
-  // Danh sách các bản ghi từ vựng (Record Object)
+  // Dữ liệu từ vựng (Record Object động)
   records: [
-    { id: 'VOC-0001', stt: 1, q: 'xin chào', a: 'hello', mask: 'Lời chào xã giao', pinyin: '/həˈləʊ/', extra: 'Chào hỏi', input: '', status: '' },
-    { id: 'VOC-0002', stt: 2, q: 'cảm ơn', a: 'thank you | thanks', mask: 'Biểu thị lòng biết ơn', pinyin: '/θæŋk juː/', extra: 'Lịch sự', input: '', status: '' },
-    { id: 'VOC-0003', stt: 3, q: 'trường học', a: 'school', mask: 'Nơi có thầy cô & bạn bè', pinyin: '/skuːl/', extra: 'Địa điểm', input: '', status: '' },
-    { id: 'VOC-0004', stt: 4, q: 'giáo viên', a: 'teacher', mask: 'Người truyền đạt kiến thức', pinyin: '/ˈtiːtʃə/', extra: 'Nghề nghiệp', input: '', status: '' },
-    { id: 'VOC-0005', stt: 5, q: 'học sinh', a: 'student', mask: 'Người tiếp thu bài học', pinyin: '/ˈstjuːdnt/', extra: 'Người học', input: '', status: '' }
+    { id: 'VOC-0001', stt: 1, c_q: 'xin chào', c_inp: '', c_res: '', c_a: '你好', c_mask: 'Lời chào xã giao', c_pinyin: 'nǐ hǎo', c_extra: 'Chào hỏi' },
+    { id: 'VOC-0002', stt: 2, c_q: 'cảm ơn', c_inp: '', c_res: '', c_a: '谢谢', c_mask: 'Biểu thị lòng biết ơn', c_pinyin: 'xièxie', c_extra: 'Lịch sự' },
+    { id: 'VOC-0003', stt: 3, c_q: 'trường học', c_inp: '', c_res: '', c_a: '学校', c_mask: 'Nơi có thầy cô & bạn bè', c_pinyin: 'xuéxiào', c_extra: 'Địa điểm' },
+    { id: 'VOC-0004', stt: 4, c_q: 'giáo viên', c_inp: '', c_res: '', c_a: '老师', c_mask: 'Người truyền đạt kiến thức', c_pinyin: 'lǎoshī', c_extra: 'Nghề nghiệp' },
+    { id: 'VOC-0005', stt: 5, c_q: 'học sinh', c_inp: '', c_res: '', c_a: '学生', c_mask: 'Người tiếp thu bài học', c_pinyin: 'xuéshēng', c_extra: 'Người học' }
   ],
-  originalRecords: null, // Sao lưu để khôi phục thứ tự gốc
+  originalRecords: null,
 
-  // Cấu hình các cột trong bảng tính
+  // Cấu hình Cột ĐỘNG HOÀN TOÀN (Tùy biến 100% trên giao diện)
   columns: [
-    { key: 'stt', title: 'STT', role: 'stt', width: 55, readonly: true },
-    { key: 'id', title: 'Mã từ', role: 'id', width: 90, readonly: true },
-    { key: 'q', title: 'Đề bài', role: 'q', width: 170, readonly: false },
-    { key: 'input', title: 'Ô làm bài', role: 'input', width: 170, readonly: false },
-    { key: 'res', title: 'Kết quả', role: 'res', width: 90, readonly: true },
-    { key: 'mask', title: 'Ô che / Gợi ý', role: 'mask', width: 170, readonly: false },
-    { key: 'a', title: 'Đáp án chuẩn', role: 'a', width: 160, readonly: false },
-    { key: 'pinyin', title: 'Phiên âm / Pinyin', role: 'pinyin', width: 140, readonly: false },
-    { key: 'extra', title: 'Ghi chú thêm', role: 'extra', width: 150, readonly: false }
+    { key: 'stt', title: 'STT', role: 'stt', width: 50, readonly: true },
+    { key: 'id', title: 'Mã từ', role: 'id', width: 85, readonly: true },
+    { key: 'c_q', title: 'Đề bài', role: 'q', width: 160, readonly: false },
+    { key: 'c_inp', title: 'Ô làm bài', role: 'input', width: 160, readonly: false },
+    { key: 'c_res', title: 'Kết quả', role: 'res', width: 90, readonly: true },
+    { key: 'c_a', title: 'Đáp án chuẩn', role: 'a', width: 160, readonly: false },
+    { key: 'c_mask', title: 'Ô che mở khóa', role: 'mask', width: 180, readonly: false },
+    { key: 'c_pinyin', title: 'Phiên âm / Pinyin', role: 'pinyin', width: 140, readonly: false },
+    { key: 'c_extra', title: 'Ghi chú thêm', role: 'extra', width: 140, readonly: false }
   ],
 
-  // Cấu hình làm bài & Xuất Excel
+  // Cấu hình ứng dụng
   config: {
     mode: 'practice',          // 'practice' | 'exam'
-    maskRule: 'on_correct',    // 'on_correct' | 'on_submit' | 'always'
-    caseInsensitive: true,     // Bỏ qua chữ hoa/thường
-    multipleAnswers: true,     // Cho phép nhiều đáp án a | b
-    hideIdOnExport: true,      // Ẩn cột Mã từ khi xuất Excel (Mặc định BẬT)
-    hideAnswerOnExport: false, // Ẩn cột đáp án khi xuất Excel
-    lockSheet: true,           // Khóa Sheet Excel
-    sheetPassword: '',         // Mật khẩu khóa
-    isExamSubmitted: false,    // Đã nộp bài kiểm tra hay chưa
-    ttsLang: 'en-US'           // Ngôn ngữ phát âm Text-to-Speech
+    maskRule: 'on_correct',    // 'on_correct' (đúng mới hiện) | 'on_submit' (nộp bài mới hiện) | 'always'
+    caseInsensitive: true,
+    multipleAnswers: true,
+    hideIdOnExport: true,      // Ẩn cột ID trong Excel (Mặc định BẬT)
+    hideAnswerOnExport: false,
+    lockSheet: true,
+    sheetPassword: '',
+    isExamSubmitted: false,
+    ttsLang: 'zh-CN'           // Mặc định Tiếng Trung Giản Thể
   },
 
   // Quản lý vùng chọn (Bôi đen nhiều hàng / nhiều cột / khối ô)
@@ -60,14 +55,14 @@ const App = {
   isDragging: false,
   counterId: 6,
 
-  // Trạng thái cho mini game Flashcard & Quiz
+  // Mini game Flashcard & Quiz
   flashcardIdx: 0,
   quizCurrentRow: null,
   quizScore: 0,
   quizStreak: 0
 };
 
-// Hàm chuyển số thứ tự cột sang chữ cái Excel: 0 -> A, 1 -> B, 25 -> Z, 26 -> AA...
+// Chuyển số cột sang chữ cái Excel: 0 -> A, 1 -> B, 26 -> AA...
 function colLetter(n) {
   let s = '';
   for (n++; n; n = Math.floor((n - 1) / 26)) {
@@ -79,12 +74,12 @@ function colLetter(n) {
 const $ = id => document.getElementById(id);
 
 // ==========================================
-// 2. KHỞI TẠO & RENDER BẢNG TÍNH
+// 2. KHỞI TẠO & RENDER BẢNG TÍNH ĐỘNG
 // ==========================================
 function initApp() {
   App.originalRecords = JSON.parse(JSON.stringify(App.records));
 
-  bindToolbarEvents();
+  bindControlEvents();
   bindSelectionEvents();
   bindModalsEvents();
 
@@ -93,25 +88,40 @@ function initApp() {
 }
 
 /**
- * Render cấu trúc bảng tính Table (Header + Rows)
+ * Render toàn bộ cấu trúc Table động
  */
 function renderTable() {
   const table = $('sheet-table');
   const { columns, records } = App;
 
-  // 1. Tạo Header Thead
+  // 1. HEADER (THEAD) - CHO PHÉP ĐỔI TÊN & VAI TRÒ TRỰC TIẾP TẠI MỖI CỘT
   let theadHtml = '<thead><tr><th class="corner-header" title="Chọn toàn bộ bảng">◢</th>';
   columns.forEach((col, cIdx) => {
-    const roleBadge = getRoleBadgeName(col.role);
+    const isProtected = ['stt', 'id'].includes(col.role);
     theadHtml += `
-      <th class="col-header" data-c="${cIdx}" style="width: ${col.width}px;" title="Bấm hoặc kéo để chọn cột ${colLetter(cIdx)}">
-        ${colLetter(cIdx)}
-        <span class="col-role-tag">${roleBadge}</span>
+      <th class="col-header" data-c="${cIdx}" style="width: ${col.width}px;" title="Bấm để chọn cột ${colLetter(cIdx)}">
+        <div class="col-header-box">
+          <div class="col-top-row">
+            <span class="col-letter">${colLetter(cIdx)}</span>
+            ${!isProtected ? `<button class="col-del-btn" data-c="${cIdx}" title="Xóa cột này">✖</button>` : ''}
+          </div>
+          <input type="text" class="col-name-input" data-c="${cIdx}" value="${escapeHtml(col.title)}" ${isProtected ? 'readonly' : ''}>
+          <select class="col-role-select" data-c="${cIdx}" ${isProtected ? 'disabled' : ''}>
+            <option value="q" ${col.role === 'q' ? 'selected' : ''}>🎯 Đề bài</option>
+            <option value="input" ${col.role === 'input' ? 'selected' : ''}>✏️ Ô làm bài</option>
+            <option value="a" ${col.role === 'a' ? 'selected' : ''}>🔑 Đáp án</option>
+            <option value="mask" ${col.role === 'mask' ? 'selected' : ''}>👁️ Ô che</option>
+            <option value="res" ${col.role === 'res' ? 'selected' : ''}>📊 Kết quả</option>
+            <option value="pinyin" ${col.role === 'pinyin' ? 'selected' : ''}>🗣️ Pinyin</option>
+            <option value="extra" ${col.role === 'extra' ? 'selected' : ''}>📝 Ghi chú</option>
+            ${isProtected ? `<option value="${col.role}" selected>${col.title}</option>` : ''}
+          </select>
+        </div>
       </th>`;
   });
   theadHtml += '</tr></thead>';
 
-  // 2. Tạo Body Tbody
+  // 2. NỘI DUNG (TBODY)
   let tbodyHtml = '<tbody>';
   records.forEach((row, rIdx) => {
     tbodyHtml += `<tr><th class="row-header" data-r="${rIdx}" title="Bấm hoặc kéo để chọn hàng ${rIdx + 1}">${rIdx + 1}</th>`;
@@ -128,14 +138,14 @@ function renderTable() {
         val = row.status || '';
         extraClass = 'col-res-cell';
       } else if (col.role === 'input') {
-        val = row.input || '';
+        val = row[col.key] || '';
         extraClass = 'col-input-cell';
       } else if (col.role === 'mask') {
         extraClass = 'col-mask-cell';
         val = getMaskDisplayValue(row, col.key);
         if (isCellMasked(row)) {
           extraClass += ' masked';
-          isEditable = false; // Khi đang bị che thì không sửa trực tiếp
+          isEditable = false;
         } else {
           extraClass += ' revealed';
         }
@@ -155,26 +165,13 @@ function renderTable() {
 
   table.innerHTML = theadHtml + tbodyHtml;
 
+  bindHeaderActions();
   highlightSelection();
   updateFxBar();
 }
 
 function escapeHtml(text) {
   return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function getRoleBadgeName(role) {
-  switch (role) {
-    case 'q': return '🎯 Đề bài';
-    case 'a': return '🔑 Đáp án';
-    case 'input': return '✏️ Ô nhập';
-    case 'mask': return '👁️ Ô che';
-    case 'res': return '📊 Kết quả';
-    case 'stt': return 'STT';
-    case 'id': return 'Mã từ';
-    case 'pinyin': return 'Phiên âm';
-    default: return 'Ghi chú';
-  }
 }
 
 function getStatusStyle(status, role) {
@@ -184,87 +181,107 @@ function getStatusStyle(status, role) {
   return '';
 }
 
-// Kiểm tra xem ô che có đang bị che giấu không
 function isCellMasked(row) {
   const { maskRule, mode, isExamSubmitted } = App.config;
   if (maskRule === 'always') return false;
   if (maskRule === 'on_submit') {
     return mode === 'exam' && !isExamSubmitted;
   }
-  // on_correct: Đúng thì hiện, chưa đúng thì che
   return row.status !== 'ĐÚNG';
 }
 
 function getMaskDisplayValue(row, key) {
-  if (isCellMasked(row)) {
-    return '🔒 ••••••';
-  }
+  if (isCellMasked(row)) return '🔒 ••••••';
   return row[key] ?? '';
 }
 
 // ==========================================
-// 3. TƯƠNG TÁC CHUỘT & BÔI ĐEN NHIỀU HÀNG/CỘT
+// 3. THAO TÁC CỘT TRỰC TIẾP TRÊN HEADER
+// ==========================================
+function bindHeaderActions() {
+  // Đổi tên cột
+  document.querySelectorAll('.col-name-input').forEach(input => {
+    input.onchange = e => {
+      const c = +e.target.dataset.c;
+      App.columns[c].title = e.target.value.trim() || `Cột ${colLetter(c)}`;
+      updateFxBar();
+    };
+  });
+
+  // Đổi vai trò cột tức thì
+  document.querySelectorAll('.col-role-select').forEach(select => {
+    select.onchange = e => {
+      const c = +e.target.dataset.c;
+      const newRole = e.target.value;
+      App.columns[c].role = newRole;
+      App.columns[c].readonly = ['stt', 'id', 'res'].includes(newRole);
+      renderTable();
+      updateScoring();
+    };
+  });
+
+  // Nút xóa cột trực tiếp trên từng header
+  document.querySelectorAll('.col-del-btn').forEach(btn => {
+    btn.onclick = e => {
+      e.stopPropagation();
+      const c = +btn.dataset.c;
+      deleteColumnAtIndex(c);
+    };
+  });
+}
+
+function deleteColumnAtIndex(c) {
+  if (App.columns.length <= 3) {
+    alert('Bảng cần tối thiểu 3 cột để hoạt động!');
+    return;
+  }
+  App.columns.splice(c, 1);
+  App.selection.activeCol = Math.max(0, c - 1);
+  renderTable();
+  updateScoring();
+}
+
+// ==========================================
+// 4. BÔI ĐEN NHIỀU HÀNG / NHIỀU CỘT / KHỐI Ô
 // ==========================================
 function bindSelectionEvents() {
   const table = $('sheet-table');
 
-  // Chuột nhấn xuống bắt đầu vùng chọn
   table.addEventListener('mousedown', e => {
     const td = e.target.closest('td');
-    const thCol = e.target.closest('th.col-header');
     const thRow = e.target.closest('th.row-header');
+    const thCol = e.target.closest('th.col-header');
     const thCorner = e.target.closest('th.corner-header');
 
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') {
+      return;
+    }
+
     if (td) {
-      // Bôi đen các ô (cells)
       const r = +td.dataset.r;
       const c = +td.dataset.c;
-      App.selection = {
-        type: 'cells',
-        startRow: r, startCol: c,
-        endRow: r, endCol: c,
-        activeRow: r, activeCol: c
-      };
+      App.selection = { type: 'cells', startRow: r, startCol: c, endRow: r, endCol: c, activeRow: r, activeCol: c };
       App.isDragging = true;
       highlightSelection();
       updateFxBar();
     } else if (thRow) {
-      // Bôi đen cả hàng (rows)
       const r = +thRow.dataset.r;
-      App.selection = {
-        type: 'rows',
-        startRow: r, startCol: 0,
-        endRow: r, endCol: App.columns.length - 1,
-        activeRow: r, activeCol: 0
-      };
+      App.selection = { type: 'rows', startRow: r, startCol: 0, endRow: r, endCol: App.columns.length - 1, activeRow: r, activeCol: 0 };
       App.isDragging = true;
       highlightSelection();
       updateFxBar();
     } else if (thCol) {
-      // Bôi đen cả cột (cols)
       const c = +thCol.dataset.c;
-      App.selection = {
-        type: 'cols',
-        startRow: 0, startCol: c,
-        endRow: App.records.length - 1, endCol: c,
-        activeRow: 0, activeCol: c
-      };
+      App.selection = { type: 'cols', startRow: 0, startCol: c, endRow: App.records.length - 1, endCol: c, activeRow: 0, activeCol: c };
       App.isDragging = true;
       highlightSelection();
       updateFxBar();
     } else if (thCorner) {
-      // Chọn tất cả
-      App.selection = {
-        type: 'cells',
-        startRow: 0, startCol: 0,
-        endRow: App.records.length - 1, endCol: App.columns.length - 1,
-        activeRow: 0, activeCol: 0
-      };
+      App.selection = { type: 'cells', startRow: 0, startCol: 0, endRow: App.records.length - 1, endCol: App.columns.length - 1, activeRow: 0, activeCol: 0 };
       highlightSelection();
     }
   });
 
-  // Kéo chuột bôi đen nhiều hàng / nhiều cột liên tục
   table.addEventListener('mouseover', e => {
     if (!App.isDragging) return;
     const td = e.target.closest('td');
@@ -284,11 +301,9 @@ function bindSelectionEvents() {
     }
   });
 
-  document.addEventListener('mouseup', () => {
-    App.isDragging = false;
-  });
+  document.addEventListener('mouseup', () => { App.isDragging = false; });
 
-  // Nhập trực tiếp vào ô
+  // Nhập dữ liệu trực tiếp trong ô
   table.addEventListener('input', e => {
     const td = e.target.closest('td');
     if (!td) return;
@@ -297,9 +312,7 @@ function bindSelectionEvents() {
     const col = App.columns[c];
     const val = td.textContent.trim();
 
-    if (col.role === 'input') {
-      App.records[r].input = val;
-    } else if (col.key && !col.readonly) {
+    if (col && !col.readonly) {
       App.records[r][col.key] = val;
     }
 
@@ -309,17 +322,13 @@ function bindSelectionEvents() {
     updateFxBar();
   });
 
-  // Phím Delete / Backspace: Tự động xóa theo phạm vi chọn
+  // Phím Delete: Xóa thông minh theo vùng chọn
   document.addEventListener('keydown', e => {
     if ((e.key === 'Delete' || e.key === 'Backspace') && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
       e.preventDefault();
-      if (App.selection.type === 'rows') {
-        deleteSelectedRows();
-      } else if (App.selection.type === 'cols') {
-        deleteSelectedColumns();
-      } else {
-        clearSelectedCells();
-      }
+      if (App.selection.type === 'rows') deleteSelectedRows();
+      else if (App.selection.type === 'cols') deleteSelectedColumns();
+      else clearSelectedCells();
     }
   });
 
@@ -330,11 +339,7 @@ function bindSelectionEvents() {
     if (!col || col.readonly) return;
 
     const val = e.target.value;
-    if (col.role === 'input') {
-      App.records[activeRow].input = val;
-    } else {
-      App.records[activeRow][col.key] = val;
-    }
+    App.records[activeRow][col.key] = val;
 
     const td = getCell(activeRow, activeCol);
     if (td) td.textContent = val;
@@ -349,9 +354,6 @@ function getCell(r, c) {
   return document.querySelector(`td[data-r="${r}"][data-c="${c}"]`);
 }
 
-/**
- * Hiển thị bôi đen vùng chọn
- */
 function highlightSelection() {
   document.querySelectorAll('.cell-selected, .cell-focus, th.row-selected, th.col-selected').forEach(el => {
     el.classList.remove('cell-selected', 'cell-focus', 'row-selected', 'col-selected');
@@ -368,9 +370,7 @@ function highlightSelection() {
       const td = getCell(r, c);
       if (td) {
         td.classList.add('cell-selected');
-        if (r === activeRow && c === activeCol) {
-          td.classList.add('cell-focus');
-        }
+        if (r === activeRow && c === activeCol) td.classList.add('cell-focus');
       }
     }
     const thRow = document.querySelector(`th.row-header[data-r="${r}"]`);
@@ -398,7 +398,6 @@ function updateFxBar() {
       if (col.role === 'stt') val = activeRow + 1;
       else if (col.role === 'id') val = row.id;
       else if (col.role === 'res') val = row.status || '';
-      else if (col.role === 'input') val = row.input || '';
       else val = row[col.key] ?? '';
     }
   }
@@ -426,7 +425,6 @@ function refreshRowDisplay(r) {
   });
 }
 
-// Xóa trắng dữ liệu ô đang bôi đen
 function clearSelectedCells() {
   const { startRow, startCol, endRow, endCol } = App.selection;
   const minR = Math.min(startRow, endRow);
@@ -438,9 +436,7 @@ function clearSelectedCells() {
     for (let c = minC; c <= maxC; c++) {
       const col = App.columns[c];
       if (col && !col.readonly) {
-        if (col.role === 'input') App.records[r].input = '';
-        else App.records[r][col.key] = '';
-
+        App.records[r][col.key] = '';
         const td = getCell(r, c);
         if (td) td.textContent = '';
       }
@@ -453,31 +449,37 @@ function clearSelectedCells() {
 }
 
 // ==========================================
-// 4. CHẤM ĐIỂM & ĐÁNH GIÁ KẾT QUẢ
+// 5. CHẤM ĐIỂM & ĐÁNH GIÁ KẾT QUẢ
 // ==========================================
 function evaluateRow(row) {
-  const input = (row.input || '').trim();
-  const answer = (row.a || '').trim();
+  const colInp = App.columns.find(c => c.role === 'input');
+  const colA = App.columns.find(c => c.role === 'a');
 
-  // Chế độ kiểm tra và chưa nộp bài -> Không hiện kết quả
+  if (!colInp || !colA) {
+    row.status = '';
+    return;
+  }
+
+  const input = (row[colInp.key] || '').trim();
+  const answer = (row[colA.key] || '').trim();
+
   if (App.config.mode === 'exam' && !App.config.isExamSubmitted) {
     row.status = '';
     return;
   }
 
-  // Chưa nhập -> Chưa làm
   if (!input) {
     row.status = '';
     return;
   }
 
   const { caseInsensitive, multipleAnswers } = App.config;
-  const normalize = str => caseInsensitive ? str.toLowerCase().trim() : str.trim();
+  const normalize = s => caseInsensitive ? s.toLowerCase().trim() : s.trim();
   const userAns = normalize(input);
 
   if (multipleAnswers) {
-    const validAnswers = answer.split('|').map(normalize);
-    row.status = validAnswers.includes(userAns) ? 'ĐÚNG' : 'SAI';
+    const valids = answer.split('|').map(normalize);
+    row.status = valids.includes(userAns) ? 'ĐÚNG' : 'SAI';
   } else {
     row.status = (userAns === normalize(answer)) ? 'ĐÚNG' : 'SAI';
   }
@@ -486,28 +488,28 @@ function evaluateRow(row) {
 function updateScoring() {
   App.records.forEach(row => evaluateRow(row));
 
-  let correct = 0, wrong = 0, answered = 0, totalWithAnswer = 0;
+  const colA = App.columns.find(c => c.role === 'a');
+  const colInp = App.columns.find(c => c.role === 'input');
+
+  let correct = 0, wrong = 0, answered = 0, total = 0;
 
   App.records.forEach(r => {
-    if ((r.a || '').trim()) totalWithAnswer++;
-    if ((r.input || '').trim()) answered++;
+    if (colA && (r[colA.key] || '').trim()) total++;
+    if (colInp && (r[colInp.key] || '').trim()) answered++;
     if (r.status === 'ĐÚNG') correct++;
     else if (r.status === 'SAI') wrong++;
   });
 
-  const pending = totalWithAnswer - correct - wrong;
-  const rate = totalWithAnswer ? Math.round((correct / totalWithAnswer) * 100) : 0;
-  const score10 = totalWithAnswer ? ((correct / totalWithAnswer) * 10).toFixed(2) : '0.00';
-  const progressPercent = totalWithAnswer ? Math.min(100, Math.round((answered / totalWithAnswer) * 100)) : 0;
+  const pending = total - correct - wrong;
+  const rate = total ? Math.round((correct / total) * 100) : 0;
+  const score10 = total ? ((correct / total) * 10).toFixed(2) : '0.00';
+  const progressPercent = total ? Math.min(100, Math.round((answered / total) * 100)) : 0;
 
   $('statCorrect').textContent = correct;
   $('statWrong').textContent = wrong;
   $('statPending').textContent = pending;
-  $('statTotal').textContent = totalWithAnswer;
   $('statScore').textContent = score10;
-  $('statRate').textContent = `${rate}%`;
-
-  $('progressText').textContent = `${answered}/${totalWithAnswer} câu (${progressPercent}%)`;
+  $('progressText').textContent = `${answered}/${total} câu (${progressPercent}%)`;
   $('progressBarFill').style.width = `${progressPercent}%`;
 
   const badge = $('examStatusBadge');
@@ -525,40 +527,36 @@ function updateScoring() {
 }
 
 // ==========================================
-// 5. BỘ QUÉT UNIVERSAL MULTI-ENGINE PARSER
+// 6. UNIVERSAL MULTI-LANGUAGE PARSER
 // ==========================================
-let currentDelimiterMode = 'auto';
-let parsedImportRows = [];
+let currentDelim = 'auto';
+let parsedImportData = [];
 
-function detectBestDelimiter(text) {
-  const sampleLines = text.split(/\r?\n/).slice(0, 15).filter(l => l.trim());
+function detectDelimiter(text) {
+  const sample = text.split(/\r?\n/).slice(0, 15).filter(l => l.trim());
   const counts = { '\t': 0, ',': 0, ';': 0, '|': 0, '-': 0, ':': 0 };
 
-  sampleLines.forEach(l => {
+  sample.forEach(l => {
     if (l.includes('\t')) counts['\t']++;
     if (l.includes(',')) counts[',']++;
     if (l.includes(';')) counts[';']++;
     if (l.includes('|')) counts['|']++;
-    if (l.includes(' - ') || l.includes(' – ') || l.includes(' — ')) counts['-']++;
-    if (l.includes(' : ') || l.includes(':')) counts[':']++;
+    if (/\s+[-–—]\s+/.test(l)) counts['-']++;
+    if (/\s*[:：]\s*/.test(l)) counts[':']++;
   });
 
-  let best = '\t';
-  let maxVal = 0;
-  for (const [delim, cnt] of Object.entries(counts)) {
-    if (cnt > maxVal) {
-      maxVal = cnt;
-      best = delim;
-    }
+  let best = '\t', max = 0;
+  for (const [d, c] of Object.entries(counts)) {
+    if (c > max) { max = c; best = d; }
   }
-  return maxVal > 0 ? best : '\t';
+  return max > 0 ? best : '\t';
 }
 
-function parseTextLines(text, forcedDelim = 'auto') {
+function parseTextLines(text, delimMode) {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   if (!lines.length) return [];
 
-  const delim = forcedDelim === 'auto' ? detectBestDelimiter(text) : forcedDelim;
+  const delim = delimMode === 'auto' ? detectDelimiter(text) : delimMode;
 
   return lines.map(line => {
     let parts = [];
@@ -570,13 +568,12 @@ function parseTextLines(text, forcedDelim = 'auto') {
     } else if (delim === ':') {
       parts = line.split(/\s*[:：]\s*/);
     } else if (delim === ',') {
-      // Hỗ trợ CSV có ngoặc kép
       const regex = /(?:^|,)(?:"([^"]*(?:""[^"]*)*)"|([^",]*))/g;
       let match;
       while ((match = regex.exec(line))) {
         if (match[0] === '' && regex.lastIndex >= line.length) break;
-        let val = match[1] ? match[1].replace(/""/g, '"') : match[2];
-        parts.push(val ? val.trim() : '');
+        let v = match[1] ? match[1].replace(/""/g, '"') : match[2];
+        parts.push(v ? v.trim() : '');
       }
     } else {
       parts = line.split(delim);
@@ -587,86 +584,123 @@ function parseTextLines(text, forcedDelim = 'auto') {
 
 function analyzeImportText() {
   const text = $('importTextarea').value;
-  parsedImportRows = parseTextLines(text, currentDelimiterMode);
+  parsedImportData = parseTextLines(text, currentDelim);
 
-  if (!parsedImportRows.length) {
-    alert('Vui lòng dán dữ liệu từ vựng vào ô văn bản!');
+  if (!parsedImportData.length) {
+    alert('Vui lòng dán dữ liệu từ vựng vào ô!');
     return;
   }
 
-  const maxCols = Math.max(...parsedImportRows.map(r => r.length));
+  const maxCols = Math.max(...parsedImportData.map(r => r.length));
   const previewTable = $('previewTable');
 
-  // Gợi ý vai trò cột thông minh
+  // Gợi ý vai trò cột thông minh theo dữ liệu thực tế
   const suggestedRoles = [];
   for (let c = 0; c < maxCols; c++) {
-    const colSamples = parsedImportRows.slice(0, 10).map(r => r[c] || '');
-    const isChinese = colSamples.filter(s => /[\u4e00-\u9fff]/.test(s)).length >= colSamples.length * 0.4;
-    const isPinyin = colSamples.filter(s => /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü\/\[\]]/.test(s)).length >= colSamples.length * 0.4;
+    const samples = parsedImportData.slice(0, 10).map(r => r[c] || '');
+    const isChinese = samples.filter(s => /[\u4e00-\u9fff]/.test(s)).length >= samples.length * 0.4;
+    const isPinyin = samples.filter(s => /[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü\/\[\]]/.test(s)).length >= samples.length * 0.4;
 
-    if (c === 0) suggestedRoles.push('q');             // Cột 1 mặc định là Đề bài
-    else if (c === 1) suggestedRoles.push('a');        // Cột 2 là Đáp án chuẩn
-    else if (isPinyin) suggestedRoles.push('pinyin');  // Phiên âm
-    else if (isChinese && !suggestedRoles.includes('a')) suggestedRoles.push('a');
-    else if (c === 2) suggestedRoles.push('mask');     // Cột 3 là Ô che/Gợi ý
+    if (c === 0) suggestedRoles.push('q');
+    else if (isChinese || c === 1) suggestedRoles.push('a');
+    else if (isPinyin) suggestedRoles.push('pinyin');
+    else if (c === 2) suggestedRoles.push('mask');
     else suggestedRoles.push('extra');
   }
 
-  // Header chọn vai trò
-  let theadHtml = '<thead><tr>';
+  let thead = '<thead><tr>';
   for (let c = 0; c < maxCols; c++) {
-    theadHtml += `
+    thead += `
       <th>
         <select class="preview-role-select" data-col="${c}">
-          <option value="q" ${suggestedRoles[c] === 'q' ? 'selected' : ''}>🎯 Cột Đề bài</option>
-          <option value="a" ${suggestedRoles[c] === 'a' ? 'selected' : ''}>🔑 Cột Đáp án</option>
-          <option value="mask" ${suggestedRoles[c] === 'mask' ? 'selected' : ''}>👁️ Cột Ô che/Gợi ý</option>
-          <option value="pinyin" ${suggestedRoles[c] === 'pinyin' ? 'selected' : ''}>🗣️ Phiên âm/Pinyin</option>
-          <option value="extra" ${suggestedRoles[c] === 'extra' ? 'selected' : ''}>📝 Ghi chú/Khác</option>
+          <option value="q" ${suggestedRoles[c] === 'q' ? 'selected' : ''}>🎯 Đề bài</option>
+          <option value="a" ${suggestedRoles[c] === 'a' ? 'selected' : ''}>🔑 Đáp án</option>
+          <option value="mask" ${suggestedRoles[c] === 'mask' ? 'selected' : ''}>👁️ Ô che</option>
+          <option value="pinyin" ${suggestedRoles[c] === 'pinyin' ? 'selected' : ''}>🗣️ Pinyin / Phiên âm</option>
+          <option value="extra" ${suggestedRoles[c] === 'extra' ? 'selected' : ''}>📝 Ghi chú / Khác</option>
           <option value="ignore">❌ Bỏ qua</option>
         </select>
       </th>`;
   }
-  theadHtml += '</tr></thead><tbody>';
+  thead += '</tr></thead><tbody>';
 
-  // Hiển thị 5 dòng xem trước
-  parsedImportRows.slice(0, 6).forEach(row => {
-    theadHtml += '<tr>';
+  parsedImportData.slice(0, 6).forEach(row => {
+    thead += '<tr>';
     for (let c = 0; c < maxCols; c++) {
-      theadHtml += `<td>${escapeHtml(row[c] || '')}</td>`;
+      thead += `<td>${escapeHtml(row[c] || '')}</td>`;
     }
-    theadHtml += '</tr>';
+    thead += '</tr>';
   });
-  theadHtml += '</tbody>';
+  thead += '</tbody>';
 
-  previewTable.innerHTML = theadHtml;
+  previewTable.innerHTML = thead;
   $('previewArea').style.display = 'block';
   $('btnConfirmImport').style.display = 'inline-flex';
 }
 
 function confirmImport() {
   const selects = document.querySelectorAll('.preview-role-select');
-  const colMappings = Array.from(selects).map(s => s.value);
+  const mappings = Array.from(selects).map(s => s.value);
 
-  const newRecords = parsedImportRows.map((row, idx) => {
-    const record = {
+  // Tạo các cột mới dựa trên cấu trúc vừa nạp
+  const newCols = [
+    { key: 'stt', title: 'STT', role: 'stt', width: 50, readonly: true },
+    { key: 'id', title: 'Mã từ', role: 'id', width: 85, readonly: true }
+  ];
+
+  let hasInput = false;
+  let hasRes = false;
+
+  mappings.forEach((role, idx) => {
+    if (role === 'ignore') return;
+    const key = `col_${idx}`;
+    let title = 'Cột ' + (idx + 1);
+    if (role === 'q') title = 'Đề bài';
+    else if (role === 'a') title = 'Đáp án chuẩn';
+    else if (role === 'mask') title = 'Ô che mở khóa';
+    else if (role === 'pinyin') title = 'Pinyin / Phiên âm';
+    else if (role === 'extra') title = 'Ghi chú';
+
+    newCols.push({ key, title, role, width: 160, readonly: false });
+
+    // Tự động chèn Ô làm bài và Kết quả ngay sau Đề bài
+    if (role === 'q' && !hasInput) {
+      newCols.push({ key: 'c_user_inp', title: 'Ô làm bài', role: 'input', width: 160, readonly: false });
+      newCols.push({ key: 'c_user_res', title: 'Kết quả', role: 'res', width: 90, readonly: true });
+      hasInput = true;
+      hasRes = true;
+    }
+  });
+
+  // Nếu chưa có ô làm bài thì thêm vào
+  if (!hasInput) {
+    newCols.splice(3, 0,
+      { key: 'c_user_inp', title: 'Ô làm bài', role: 'input', width: 160, readonly: false },
+      { key: 'c_user_res', title: 'Kết quả', role: 'res', width: 90, readonly: true }
+    );
+  }
+
+  // Nạp dữ liệu vào records
+  const newRecords = parsedImportData.map((row, idx) => {
+    const rec = {
       id: `VOC-${String(App.counterId++).padStart(4, '0')}`,
       stt: idx + 1,
-      q: '', a: '', mask: '', pinyin: '', extra: '', input: '', status: ''
+      c_user_inp: '',
+      c_user_res: '',
+      status: ''
     };
 
     row.forEach((val, cIdx) => {
-      const role = colMappings[cIdx];
-      if (role === 'q') record.q = val;
-      else if (role === 'a') record.a = val;
-      else if (role === 'mask') record.mask = val;
-      else if (role === 'pinyin') record.pinyin = val;
-      else if (role === 'extra') record.extra = record.extra ? `${record.extra} | ${val}` : val;
+      const role = mappings[cIdx];
+      if (role !== 'ignore') {
+        rec[`col_${cIdx}`] = val;
+      }
     });
 
-    return record;
+    return rec;
   });
 
+  App.columns = newCols;
   App.records = newRecords;
   App.originalRecords = JSON.parse(JSON.stringify(newRecords));
 
@@ -676,39 +710,34 @@ function confirmImport() {
 }
 
 // ==========================================
-// 6. THAO TÁC XÓA NHIỀU HÀNG / NHIỀU CỘT
+// 7. THÊM / XÓA HÀNG CỘT & BẢNG TÍNH
 // ==========================================
 function addNewRow() {
   const newId = `VOC-${String(App.counterId++).padStart(4, '0')}`;
-  const newRow = {
-    id: newId,
-    stt: App.records.length + 1,
-    q: 'Từ mới',
-    a: 'Đáp án',
-    mask: 'Gợi ý',
-    pinyin: '',
-    extra: '',
-    input: '',
-    status: ''
-  };
+  const newRow = { id: newId, stt: App.records.length + 1, status: '' };
+
+  App.columns.forEach(col => {
+    if (col.key !== 'id' && col.key !== 'stt') {
+      newRow[col.key] = '';
+    }
+  });
+
   App.records.push(newRow);
   renderTable();
   updateScoring();
 }
 
-// Xóa tất cả các hàng đang được bôi đen
 function deleteSelectedRows() {
   const { startRow, endRow } = App.selection;
   const minR = Math.min(startRow, endRow);
   const maxR = Math.max(startRow, endRow);
 
   if (App.records.length <= 1) {
-    alert('Bảng phải có ít nhất 1 hàng dữ liệu!');
+    alert('Bảng phải có ít nhất 1 hàng!');
     return;
   }
 
-  const deleteCount = maxR - minR + 1;
-  App.records.splice(minR, deleteCount);
+  App.records.splice(minR, maxR - minR + 1);
   App.records.forEach((r, idx) => r.stt = idx + 1);
 
   App.selection.startRow = Math.min(minR, App.records.length - 1);
@@ -720,96 +749,32 @@ function deleteSelectedRows() {
 }
 
 function addNewColumn() {
-  const colId = `custom_${Date.now()}`;
+  const key = `custom_${Date.now()}`;
   App.columns.push({
-    key: colId,
+    key,
     title: `Cột ${colLetter(App.columns.length)}`,
     role: 'extra',
-    width: 140,
+    width: 150,
     readonly: false
   });
   renderTable();
 }
 
-// Xóa tất cả các cột đang được bôi đen
 function deleteSelectedColumns() {
   const { startCol, endCol } = App.selection;
   const minC = Math.min(startCol, endCol);
   const maxC = Math.max(startCol, endCol);
 
-  // Không cho xóa nếu chỉ còn 3 cột cốt lõi
-  if (App.columns.length <= 3) {
-    alert('Không thể xóa thêm cột! Bảng cần tối thiểu các cột cơ bản.');
-    return;
-  }
-
-  // Kiểm tra không xóa các cột bảo vệ hệ thống
-  const protectedRoles = ['stt', 'id'];
   for (let c = minC; c <= maxC; c++) {
-    if (protectedRoles.includes(App.columns[c]?.role)) {
-      alert('Không thể xóa cột STT và cột Mã từ!');
+    if (['stt', 'id'].includes(App.columns[c]?.role)) {
+      alert('Không thể xóa cột STT và Mã từ!');
       return;
     }
   }
 
-  const deleteCount = maxC - minC + 1;
-  App.columns.splice(minC, deleteCount);
+  App.columns.splice(minC, maxC - minC + 1);
   App.selection.activeCol = Math.max(0, minC - 1);
-  App.selection.startCol = App.selection.activeCol;
-  App.selection.endCol = App.selection.activeCol;
-
   renderTable();
-}
-
-function setColumnRole(role) {
-  const { activeCol } = App.selection;
-  const targetCol = App.columns[activeCol];
-
-  if (['stt', 'id'].includes(targetCol.role)) {
-    alert('Không thể thay đổi vai trò của cột STT và Mã từ!');
-    return;
-  }
-
-  if (['q', 'a', 'input', 'res'].includes(role)) {
-    const existing = App.columns.find(c => c.role === role);
-    if (existing && existing !== targetCol) existing.role = 'extra';
-  }
-
-  targetCol.role = role;
-  renderTable();
-  updateScoring();
-}
-
-function swapQuestionAndAnswer() {
-  const colQ = App.columns.find(c => c.role === 'q');
-  const colA = App.columns.find(c => c.role === 'a');
-
-  if (!colQ || !colA) {
-    alert('Bảng chưa có đủ cặp cột Đề bài và Đáp án!');
-    return;
-  }
-
-  colQ.role = 'a';
-  colA.role = 'q';
-
-  App.records.forEach(r => {
-    [r.q, r.a] = [r.a, r.q];
-  });
-
-  renderTable();
-  updateScoring();
-}
-
-// ==========================================
-// 7. TRỘN NGUYÊN HÀNG & PHỤC HỒI
-// ==========================================
-function shuffleArray(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 function shuffleAllRows() {
@@ -838,8 +803,17 @@ function pickRandomSubset(n) {
   updateScoring();
 }
 
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // ==========================================
-// 8. IMPORT NGƯỢC FILE EXCEL/CSV ĐỂ SỬA
+// 8. IMPORT NGƯỢC FILE EXCEL CŨ ĐỂ SỬA
 // ==========================================
 async function handleImportExcelFile(e) {
   const file = e.target.files[0];
@@ -852,15 +826,15 @@ async function handleImportExcelFile(e) {
 
     const ws = wb.worksheets[0];
     if (!ws) {
-      alert('File Excel không có sheet nào hợp lệ!');
+      alert('File Excel không hợp lệ!');
       return;
     }
 
-    // Tìm hàng tiêu đề (Nếu là file tool xuất thì header ở dòng 5, nếu file ngoài thì ở dòng 1)
+    // Tìm dòng header
     let headerRowIdx = 1;
-    for (let r = 1; r <= 10; r++) {
-      const rowVals = ws.getRow(r).values;
-      if (Array.isArray(rowVals) && rowVals.some(v => String(v).includes('Đề bài') || String(v).includes('Đáp án') || String(v).includes('STT'))) {
+    for (let r = 1; r <= 8; r++) {
+      const vals = ws.getRow(r).values;
+      if (Array.isArray(vals) && vals.some(v => String(v).includes('Đề bài') || String(v).includes('STT') || String(v).includes('Mã từ'))) {
         headerRowIdx = r;
         break;
       }
@@ -868,10 +842,9 @@ async function handleImportExcelFile(e) {
 
     const headerRow = ws.getRow(headerRowIdx);
     const colCount = ws.columnCount || headerRow.cellCount;
-    const importedCols = [];
+    const newCols = [];
     const keyMap = [];
 
-    // Nhận diện lại cấu trúc cột
     for (let c = 1; c <= colCount; c++) {
       const title = String(headerRow.getCell(c).value || '').trim();
       if (!title) continue;
@@ -881,100 +854,74 @@ async function handleImportExcelFile(e) {
 
       if (title.includes('STT')) { role = 'stt'; key = 'stt'; }
       else if (title.includes('Mã từ') || title.includes('ID')) { role = 'id'; key = 'id'; }
-      else if (title.includes('Đề bài') || title.includes('Question')) { role = 'q'; key = 'q'; }
-      else if (title.includes('Ô làm bài') || title.includes('Ô nhập')) { role = 'input'; key = 'input'; }
-      else if (title.includes('Kết quả')) { role = 'res'; key = 'res'; }
-      else if (title.includes('Đáp án')) { role = 'a'; key = 'a'; }
-      else if (title.includes('Ô che') || title.includes('Gợi ý')) { role = 'mask'; key = 'mask'; }
-      else if (title.includes('Phiên âm') || title.includes('Pinyin')) { role = 'pinyin'; key = 'pinyin'; }
+      else if (title.includes('Đề bài')) { role = 'q'; key = 'c_q'; }
+      else if (title.includes('Ô làm bài') || title.includes('Ô nhập')) { role = 'input'; key = 'c_inp'; }
+      else if (title.includes('Kết quả')) { role = 'res'; key = 'c_res'; }
+      else if (title.includes('Đáp án')) { role = 'a'; key = 'c_a'; }
+      else if (title.includes('Ô che') || title.includes('Gợi ý')) { role = 'mask'; key = 'c_mask'; }
+      else if (title.includes('Pinyin') || title.includes('Phiên âm')) { role = 'pinyin'; key = 'c_pinyin'; }
 
-      importedCols.push({
-        key,
-        title,
-        role,
-        width: 150,
-        readonly: ['stt', 'id', 'res'].includes(role)
-      });
+      newCols.push({ key, title, role, width: 150, readonly: ['stt', 'id', 'res'].includes(role) });
       keyMap.push({ colIndex: c, key, role });
     }
 
-    // Đọc các hàng dữ liệu
-    const importedRecords = [];
-    const dataStartRow = headerRowIdx + 1;
-
-    for (let r = dataStartRow; r <= ws.rowCount; r++) {
+    const newRecords = [];
+    for (let r = headerRowIdx + 1; r <= ws.rowCount; r++) {
       const row = ws.getRow(r);
-      // Bỏ qua dòng trống
       if (!row.hasValues) continue;
 
-      const rec = {
-        id: `VOC-${String(App.counterId++).padStart(4, '0')}`,
-        stt: importedRecords.length + 1,
-        input: '',
-        status: ''
-      };
-
+      const rec = { id: `VOC-${String(App.counterId++).padStart(4, '0')}`, stt: newRecords.length + 1, status: '' };
       keyMap.forEach(({ colIndex, key, role }) => {
-        let cellVal = row.getCell(colIndex).value;
-        // Nếu cell là công thức/object
-        if (cellVal && typeof cellVal === 'object') {
-          cellVal = cellVal.result || cellVal.text || '';
-        }
-        if (role === 'id' && cellVal) rec.id = String(cellVal);
+        let val = row.getCell(colIndex).value;
+        if (val && typeof val === 'object') val = val.result || val.text || '';
+        if (role === 'id' && val) rec.id = String(val);
         else if (role !== 'res' && role !== 'input') {
-          rec[key] = cellVal != null ? String(cellVal).trim() : '';
+          rec[key] = val != null ? String(val).trim() : '';
         }
       });
-
-      importedRecords.push(rec);
+      newRecords.push(rec);
     }
 
-    if (!importedRecords.length) {
-      alert('Không tìm thấy dòng dữ liệu nào trong file Excel!');
-      return;
-    }
-
-    App.columns = importedCols;
-    App.records = importedRecords;
-    App.originalRecords = JSON.parse(JSON.stringify(importedRecords));
+    App.columns = newCols;
+    App.records = newRecords;
+    App.originalRecords = JSON.parse(JSON.stringify(newRecords));
 
     renderTable();
     updateScoring();
-    alert(`Đã nạp thành công ${importedRecords.length} câu từ file Excel vào bảng tính!`);
+    alert(`Đã nạp thành công ${newRecords.length} câu từ file Excel! Bạn có thể tiếp tục chỉnh sửa.`);
   } catch (err) {
     console.error(err);
-    alert('Không thể đọc file Excel này! Vui lòng đảm bảo file định dạng .xlsx hợp lệ.');
+    alert('Không thể đọc file Excel này! Vui lòng kiểm tra định dạng .xlsx');
   } finally {
     e.target.value = '';
   }
 }
 
 // ==========================================
-// 9. XUẤT EXCEL (.XLSX) CHUẨN MỰC
+// 9. XUẤT EXCEL (.XLSX) GIỮ NGUYÊN HIỆU LỰC
 // ==========================================
 async function exportToExcel() {
   const colQIdx = App.columns.findIndex(c => c.role === 'q');
   const colAIdx = App.columns.findIndex(c => c.role === 'a');
   const colInpIdx = App.columns.findIndex(c => c.role === 'input');
   const colResIdx = App.columns.findIndex(c => c.role === 'res');
-  const colMaskIdx = App.columns.findIndex(c => c.role === 'mask');
   const colIdIdx = App.columns.findIndex(c => c.role === 'id');
+  const colMaskIdx = App.columns.findIndex(c => c.role === 'mask');
 
   if (colQIdx === -1 || colAIdx === -1 || colInpIdx === -1 || colResIdx === -1) {
-    alert('Vui lòng đảm bảo bảng đã có đủ các cột: Đề bài, Đáp án, Ô làm bài và Kết quả!');
+    alert('Vui lòng đảm bảo bảng có đủ các cột: Đề bài, Đáp án, Ô làm bài và Kết quả!');
     return;
   }
 
   const wb = new ExcelJS.Workbook();
-  wb.creator = 'Vocab Sheet Studio';
+  wb.creator = 'Vocab Studio Pro';
   wb.created = new Date();
 
   const numVariants = Math.max(1, Math.min(10, +$('numVariants').value || 1));
   const password = $('sheetPassword').value.trim();
 
   for (let v = 0; v < numVariants; v++) {
-    const sheetName = numVariants === 1 ? 'Bài tập từ vựng' : `Đề số ${v + 1}`;
-    const ws = wb.addWorksheet(sheetName, {
+    const ws = wb.addWorksheet(numVariants === 1 ? 'Bài tập từ vựng' : `Đề số ${v + 1}`, {
       views: [{ state: 'frozen', ySplit: 5 }]
     });
 
@@ -991,9 +938,9 @@ async function exportToExcel() {
     const L_RES = colLetter(colResIdx);
     const L_A = colLetter(colAIdx);
 
-    // 1. DASHBOARD BẢNG ĐIỂM (HÀNG 1 - 4) - SỬ DỤNG CHUẨN TYPOGRAPHY KHÔNG LỖI FONT
+    // 1. DASHBOARD TIẾN ĐỘ & ĐIỂM SỐ (HÀNG 1 - 4)
     ws.mergeCells('A1:D1');
-    ws.getCell('A1').value = 'BẢNG ĐÁNH GIÁ KẾT QUẢ TỪ VỰNG';
+    ws.getCell('A1').value = 'BẢNG KẾT QUẢ ĐÁNH GIÁ TỪ VỰNG';
     ws.getCell('A1').font = { bold: true, size: 12, color: { argb: 'FF107C41' } };
 
     ws.getCell('E1').value = 'Trạng thái:';
@@ -1038,7 +985,6 @@ async function exportToExcel() {
       formula: `REPT("■",MIN(10,ROUND(B4/MAX(B3,1)*10,0)))&REPT("□",10-MIN(10,ROUND(B4/MAX(B3,1)*10,0)))&" "&TEXT(IF(B3=0,0,B4/B3),"0%")`
     };
 
-    // Nền xám nhạt cho Dashboard
     for (let r = 1; r <= 4; r++) {
       for (let c = 1; c <= Math.max(6, App.columns.length); c++) {
         const cell = ws.getCell(r, c);
@@ -1050,17 +996,17 @@ async function exportToExcel() {
       }
     }
 
-    // 2. TIÊU ĐỀ CỘT HÀNG 5
+    // 2. HEADER HÀNG 5
     App.columns.forEach((col, cIdx) => {
       const cell = ws.getCell(5, cIdx + 1);
       cell.value = col.title;
       cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
       cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF107C41' } };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      ws.getColumn(cIdx + 1).width = Math.max(12, Math.round(col.width / 7.5));
+      ws.getColumn(cIdx + 1).width = Math.max(13, Math.round(col.width / 7.2));
     });
 
-    // 3. DỮ LIỆU & CÔNG THỨC CHẤM TỰ ĐỘNG HÀNG 6+
+    // 3. DỮ LIỆU & CÔNG THỨC HÀNG 6+
     variantRecords.forEach((rec, idx) => {
       const rIdx = rowStart + idx;
 
@@ -1090,29 +1036,25 @@ async function exportToExcel() {
           }
 
           if (App.config.mode === 'exam') {
-            cell.value = {
-              formula: `IF(OR(${curInp}="",$F$1<>"Đã nộp"),"",IF(${checkFormula},"ĐÚNG","SAI"))`
-            };
+            cell.value = { formula: `IF(OR(${curInp}="",$F$1<>"Đã nộp"),"",IF(${checkFormula},"ĐÚNG","SAI"))` };
           } else {
-            cell.value = {
-              formula: `IF(${curInp}="","",IF(${checkFormula},"ĐÚNG","SAI"))`
-            };
+            cell.value = { formula: `IF(${curInp}="","",IF(${checkFormula},"ĐÚNG","SAI"))` };
           }
           cell.alignment = { horizontal: 'center' };
           cell.font = { bold: true };
         } else if (col.role === 'mask') {
-          // CÔNG THỨC Ô CHE: NHẬP ĐÚNG MỚI HIỆN HOẶC NỘP BÀI MỚI HIỆN
+          // Ô CHE: NHẬP ĐÚNG MỚI HIỆN HOẶC NỘP BÀI MỚI HIỆN
           const curInp = `${L_INP}${rIdx}`;
           const curA = `${L_A}${rIdx}`;
-          const rawMaskVal = (rec[col.key] || '').replace(/"/g, '""');
+          const rawVal = (rec[col.key] || '').replace(/"/g, '""');
 
           if (App.config.maskRule === 'on_correct') {
             cell.value = {
-              formula: `IF(AND(${curInp}<>"",LOWER(TRIM(${curInp}))=LOWER(TRIM(${curA}))),"${rawMaskVal}","🔒 [Nhập đúng để mở]")`
+              formula: `IF(AND(${curInp}<>"",LOWER(TRIM(${curInp}))=LOWER(TRIM(${curA}))),"${rawVal}","🔒 [Nhập đúng để mở]")`
             };
           } else if (App.config.maskRule === 'on_submit') {
             cell.value = {
-              formula: `IF($F$1="Đã nộp","${rawMaskVal}","🔒 [Nộp bài để xem]")`
+              formula: `IF($F$1="Đã nộp","${rawVal}","🔒 [Nộp bài để xem]")`
             };
           } else {
             cell.value = rec[col.key] || '';
@@ -1130,7 +1072,7 @@ async function exportToExcel() {
       });
     });
 
-    // 4. CONDITIONAL FORMATTING MÀU XANH/ĐỎ CHUẨN
+    // 4. CONDITIONAL FORMATTING MÀU XANH / ĐỎ
     const rangeRes = `${L_RES}${rowStart}:${L_RES}${rowEnd}`;
     const rangeInp = `${L_INP}${rowStart}:${L_INP}${rowEnd}`;
 
@@ -1158,7 +1100,7 @@ async function exportToExcel() {
       });
     });
 
-    // 5. CHE CỘT MÃ TỪ VÀ ĐÁP ÁN (NẾU CẤU HÌNH)
+    // 5. ẨN CỘT MÃ TỪ VÀ ĐÁP ÁN
     if (App.config.hideIdOnExport && colIdIdx !== -1) {
       ws.getColumn(colIdIdx + 1).hidden = true;
     }
@@ -1166,7 +1108,7 @@ async function exportToExcel() {
       ws.getColumn(colAIdx + 1).hidden = true;
     }
 
-    // 6. KHÓA BẢO VỆ BẢNG TÍNH
+    // 6. KHÓA SHEET BẢO VỆ CÔNG THỨC
     if (App.config.lockSheet) {
       await ws.protect(password, {
         selectLockedCells: true,
@@ -1175,7 +1117,6 @@ async function exportToExcel() {
     }
   }
 
-  // Tải file về máy tính
   const buffer = await wb.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = URL.createObjectURL(blob);
@@ -1187,26 +1128,27 @@ async function exportToExcel() {
 }
 
 // ==========================================
-// 10. TEXT-TO-SPEECH (PHÁT ÂM TỪ VỰNG)
+// 10. PHÁT ÂM TTS (CHUYÊN TIẾNG TRUNG GIẢN THỂ)
 // ==========================================
 function speakText(text) {
   if (!('speechSynthesis' in window)) {
-    alert('Trình duyệt của bạn không hỗ trợ tính năng đọc phát âm!');
+    alert('Trình duyệt không hỗ trợ Web Speech TTS!');
     return;
   }
   window.speechSynthesis.cancel();
   const clean = text.split('|')[0].trim();
   const utter = new SpeechSynthesisUtterance(clean);
   utter.lang = App.config.ttsLang;
+  utter.rate = 0.9; // Tốc độ chuẩn dễ nghe
   window.speechSynthesis.speak(utter);
 }
 
 // ==========================================
-// 11. MINI GAME: THẺ FLASHCARD LẬT 3D
+// 11. THẺ FLASHCARD 3D
 // ==========================================
 function openFlashcardModal() {
   if (!App.records.length) {
-    alert('Chưa có từ vựng nào để ôn tập!');
+    alert('Chưa có từ vựng nào để luyện!');
     return;
   }
   App.flashcardIdx = 0;
@@ -1216,15 +1158,18 @@ function openFlashcardModal() {
 
 function renderFlashcard() {
   const card = App.records[App.flashcardIdx];
+  const colQ = App.columns.find(c => c.role === 'q');
+  const colA = App.columns.find(c => c.role === 'a');
+  const colPinyin = App.columns.find(c => c.role === 'pinyin');
+  const colMask = App.columns.find(c => c.role === 'mask');
+
   $('flashcardInner').classList.remove('is-flipped');
-
   $('fcCardIndex').textContent = `Thẻ ${App.flashcardIdx + 1} / ${App.records.length}`;
-  $('fcFrontText').textContent = card.q || 'Không có đề bài';
-  $('fcFrontSub').textContent = 'Nhấn hoặc phím Space để xem đáp án';
 
-  $('fcBackText').textContent = card.a || '';
-  $('fcBackPinyin').textContent = card.pinyin || '';
-  $('fcBackMask').textContent = card.mask || card.extra || '';
+  $('fcFrontText').textContent = colQ ? card[colQ.key] : 'Không có đề';
+  $('fcBackText').textContent = colA ? card[colA.key] : '';
+  $('fcBackPinyin').textContent = colPinyin ? card[colPinyin.key] : '';
+  $('fcBackMask').textContent = colMask ? card[colMask.key] : '';
 }
 
 function flipFlashcard() {
@@ -1232,11 +1177,11 @@ function flipFlashcard() {
 }
 
 // ==========================================
-// 12. MINI GAME: TRẮC NGHIỆM 4 ĐÁP ÁN (QUIZ)
+// 12. TRẮC NGHIỆM 4 ĐÁP ÁN (QUIZ)
 // ==========================================
 function openQuizModal() {
   if (App.records.length < 4) {
-    alert('Cần tối thiểu 4 từ vựng trong bảng để tạo bài trắc nghiệm 4 đáp án!');
+    alert('Cần tối thiểu 4 từ vựng trong bảng để tạo trắc nghiệm!');
     return;
   }
   App.quizScore = 0;
@@ -1249,40 +1194,40 @@ function nextQuizQuestion() {
   $('btnQuizNext').style.display = 'none';
   $('quizFeedbackArea').style.display = 'none';
 
-  // Chọn ngẫu nhiên 1 câu làm câu hỏi
-  const currentIdx = Math.floor(Math.random() * App.records.length);
-  App.quizCurrentRow = App.records[currentIdx];
+  const colQ = App.columns.find(c => c.role === 'q');
+  const colA = App.columns.find(c => c.role === 'a');
 
-  $('quizQuestionText').textContent = App.quizCurrentRow.q;
+  const currIdx = Math.floor(Math.random() * App.records.length);
+  App.quizCurrentRow = App.records[currIdx];
+
+  $('quizQuestionText').textContent = App.quizCurrentRow[colQ.key];
   $('quizScoreText').textContent = `Điểm: ${App.quizScore}`;
   $('quizStreakText').textContent = `🔥 Chuỗi đúng: ${App.quizStreak}`;
 
-  // Lấy 3 đáp án sai từ các dòng khác
   const otherAnswers = App.records
-    .filter((_, idx) => idx !== currentIdx)
-    .map(r => r.a.split('|')[0].trim());
-  const shuffledOthers = shuffleArray(otherAnswers).slice(0, 3);
+    .filter((_, idx) => idx !== currIdx)
+    .map(r => (r[colA.key] || '').split('|')[0].trim())
+    .filter(Boolean);
 
-  const correctAnswer = App.quizCurrentRow.a.split('|')[0].trim();
-  const allOptions = shuffleArray([correctAnswer, ...shuffledOthers]);
+  const shuffledOthers = shuffleArray(otherAnswers).slice(0, 3);
+  const correct = (App.quizCurrentRow[colA.key] || '').split('|')[0].trim();
+  const allOpts = shuffleArray([correct, ...shuffledOthers]);
 
   const grid = $('quizOptionsGrid');
   grid.innerHTML = '';
 
-  allOptions.forEach(opt => {
+  allOpts.forEach(opt => {
     const btn = document.createElement('button');
     btn.className = 'quiz-opt-btn';
     btn.textContent = opt;
-    btn.onclick = () => handleQuizAnswer(opt, btn, correctAnswer);
+    btn.onclick = () => handleQuizAnswer(opt, btn, correct);
     grid.appendChild(btn);
   });
 }
 
-function handleQuizAnswer(selected, buttonEl, correctAnswer) {
-  const allBtns = document.querySelectorAll('.quiz-opt-btn');
-  allBtns.forEach(b => b.disabled = true);
-
-  const isCorrect = selected.toLowerCase() === correctAnswer.toLowerCase();
+function handleQuizAnswer(selected, buttonEl, correct) {
+  document.querySelectorAll('.quiz-opt-btn').forEach(b => b.disabled = true);
+  const isCorrect = selected.toLowerCase() === correct.toLowerCase();
   const fb = $('quizFeedbackArea');
   fb.style.display = 'block';
 
@@ -1292,16 +1237,16 @@ function handleQuizAnswer(selected, buttonEl, correctAnswer) {
     App.quizStreak += 1;
     fb.style.background = '#dcfce7';
     fb.style.color = '#166534';
-    fb.textContent = '🎉 CHÍNH XÁC! Bạn làm rất tốt!';
+    fb.textContent = '🎉 CHÍNH XÁC!';
   } else {
     buttonEl.classList.add('wrong');
     App.quizStreak = 0;
-    allBtns.forEach(b => {
-      if (b.textContent.toLowerCase() === correctAnswer.toLowerCase()) b.classList.add('correct');
+    document.querySelectorAll('.quiz-opt-btn').forEach(b => {
+      if (b.textContent.toLowerCase() === correct.toLowerCase()) b.classList.add('correct');
     });
     fb.style.background = '#fee2e2';
     fb.style.color = '#991b1b';
-    fb.textContent = `❌ Chưa đúng! Đáp án chính xác là: ${correctAnswer}`;
+    fb.textContent = `❌ Chưa đúng! Đáp án là: ${correct}`;
   }
 
   $('quizScoreText').textContent = `Điểm: ${App.quizScore}`;
@@ -1310,44 +1255,28 @@ function handleQuizAnswer(selected, buttonEl, correctAnswer) {
 }
 
 // ==========================================
-// 13. GẮN SỰ KIỆN GIAO DIỆN & MODAL
+// 13. GẮN SỰ KIỆN GIAO DIỆN
 // ==========================================
-function bindToolbarEvents() {
-  // 1. Dữ liệu & File
-  $('btnOpenImportModal').onclick = () => {
-    $('importModal').hidden = false;
-    $('importTextarea').focus();
-  };
+function bindControlEvents() {
+  // Nạp & Mở file
+  $('btnOpenImportModal').onclick = () => { $('importModal').hidden = false; $('importTextarea').focus(); };
   $('btnTriggerUpload').onclick = () => $('fileImportExcel').click();
   $('fileImportExcel').onchange = handleImportExcelFile;
   $('btnExportExcel').onclick = exportToExcel;
 
-  // 2. Hàng & Cột
+  // Thao tác hàng cột
   $('btnAddRow').onclick = addNewRow;
   $('btnDelRow').onclick = deleteSelectedRows;
   $('btnAddCol').onclick = addNewColumn;
   $('btnDelCol').onclick = deleteSelectedColumns;
   $('btnClearCells').onclick = clearSelectedCells;
 
-  // 3. Vai trò cột
-  $('btnSetRoleQ').onclick = () => setColumnRole('q');
-  $('btnSetRoleInput').onclick = () => setColumnRole('input');
-  $('btnSetRoleA').onclick = () => setColumnRole('a');
-  $('btnSetRoleMask').onclick = () => setColumnRole('mask');
-  $('btnSetRoleRes').onclick = () => setColumnRole('res');
-  $('btnSwapQA').onclick = swapQuestionAndAnswer;
-
-  // 4. Trộn đề
+  // Trộn & Lấy subset
   $('btnShuffle').onclick = shuffleAllRows;
   $('btnRestore').onclick = restoreOriginalOrder;
   $('btnPickSubset').onclick = () => pickRandomSubset(+$('numPick').value);
 
-  // 5. Chế độ luyện tập
-  $('btnOpenFlashcard').onclick = openFlashcardModal;
-  $('btnOpenQuiz').onclick = openQuizModal;
-  $('ttsLangSelect').onchange = e => App.config.ttsLang = e.target.value;
-
-  // 6. Cấu hình & Bảo vệ
+  // Chế độ & Quy tắc
   $('examMode').onchange = e => {
     App.config.mode = e.target.value;
     App.config.isExamSubmitted = false;
@@ -1370,6 +1299,7 @@ function bindToolbarEvents() {
     updateScoring();
     renderTable();
   };
+  $('ttsLangSelect').onchange = e => { App.config.ttsLang = e.target.value; };
   $('chkHideId').onchange = e => App.config.hideIdOnExport = e.target.checked;
   $('chkHideAnswer').onchange = e => App.config.hideAnswerOnExport = e.target.checked;
 
@@ -1379,7 +1309,7 @@ function bindToolbarEvents() {
     e.target.classList.toggle('on', App.config.lockSheet);
   };
 
-  // Nộp bài kiểm tra
+  // Nộp bài
   $('btnSubmitExam').onclick = () => {
     App.config.isExamSubmitted = true;
     $('btnSubmitExam').style.display = 'none';
@@ -1389,22 +1319,29 @@ function bindToolbarEvents() {
   };
   $('btnResetExam').onclick = () => {
     App.config.isExamSubmitted = false;
-    App.records.forEach(r => { r.input = ''; r.status = ''; });
+    const colInp = App.columns.find(c => c.role === 'input');
+    if (colInp) App.records.forEach(r => { r[colInp.key] = ''; r.status = ''; });
     $('btnSubmitExam').style.display = 'inline-flex';
     $('btnResetExam').style.display = 'none';
     updateScoring();
     renderTable();
   };
 
-  // Phát âm dòng đang chọn
-  $('btnSpeakActiveRow').onclick = () => {
-    const row = App.records[App.selection.activeRow];
-    if (row) speakText(row.a || row.q);
+  // Nghe phát âm ô đang chọn
+  $('btnSpeakActiveCell').onclick = () => {
+    const { activeRow, activeCol } = App.selection;
+    const col = App.columns[activeCol];
+    const row = App.records[activeRow];
+    if (col && row) speakText(row[col.key] || '');
   };
+
+  // Mini games
+  $('btnOpenFlashcard').onclick = openFlashcardModal;
+  $('btnOpenQuiz').onclick = openQuizModal;
 }
 
 function bindModalsEvents() {
-  // Modal Quét từ vựng
+  // Modal Import
   $('btnCloseImportModal').onclick = () => $('importModal').hidden = true;
   $('btnCancelImport').onclick = () => $('importModal').hidden = true;
   $('btnAnalyzeText').onclick = analyzeImportText;
@@ -1414,7 +1351,7 @@ function bindModalsEvents() {
     btn.onclick = () => {
       document.querySelectorAll('.btn-delimit').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentDelimiterMode = btn.dataset.delim;
+      currentDelim = btn.dataset.delim;
       if ($('importTextarea').value.trim()) analyzeImportText();
     };
   });
@@ -1433,21 +1370,19 @@ function bindModalsEvents() {
   };
   $('btnFcSpeak').onclick = () => {
     const card = App.records[App.flashcardIdx];
-    if (card) speakText(card.a || card.q);
+    const colA = App.columns.find(c => c.role === 'a');
+    if (card && colA) speakText(card[colA.key]);
   };
 
-  // Phím tắt Flashcard (Space: Lật, Mũi tên trái/phải: Đổi thẻ)
   document.addEventListener('keydown', e => {
     if (!$('flashcardModal').hidden) {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        flipFlashcard();
-      } else if (e.key === 'ArrowRight') {
-        App.flashcardIdx = (App.flashcardIdx + 1) % App.records.length;
-        renderFlashcard();
-      } else if (e.key === 'ArrowLeft') {
-        App.flashcardIdx = (App.flashcardIdx - 1 + App.records.length) % App.records.length;
-        renderFlashcard();
+      if (e.code === 'Space') { e.preventDefault(); flipFlashcard(); }
+      else if (e.key === 'ArrowRight') { App.flashcardIdx = (App.flashcardIdx + 1) % App.records.length; renderFlashcard(); }
+      else if (e.key === 'ArrowLeft') { App.flashcardIdx = (App.flashcardIdx - 1 + App.records.length) % App.records.length; renderFlashcard(); }
+      else if (e.key === 'p' || e.key === 'P') {
+        const card = App.records[App.flashcardIdx];
+        const colA = App.columns.find(c => c.role === 'a');
+        if (card && colA) speakText(card[colA.key]);
       }
     }
   });
@@ -1457,9 +1392,10 @@ function bindModalsEvents() {
   $('btnQuizExit').onclick = () => $('quizModal').hidden = true;
   $('btnQuizNext').onclick = nextQuizQuestion;
   $('btnQuizSpeak').onclick = () => {
-    if (App.quizCurrentRow) speakText(App.quizCurrentRow.q);
+    const colQ = App.columns.find(c => c.role === 'q');
+    if (App.quizCurrentRow && colQ) speakText(App.quizCurrentRow[colQ.key]);
   };
 }
 
-// Khởi chạy ứng dụng khi DOM tải xong
+// Khởi chạy khi DOM tải xong
 window.addEventListener('DOMContentLoaded', initApp);
